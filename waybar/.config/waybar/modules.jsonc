@@ -1,0 +1,91 @@
+{
+	"group/workspace": {
+		"orientation": "horizontal",
+		"modules":[
+			"temperature#icon",
+			"temperature#text",
+			"cpu#icon",
+			"cpu#text",
+			"hyprland/workspaces"
+		]
+	},
+	"temperature#icon": {
+		"format": "{icon}",
+		"format-icons": ["", "", ""],
+		"tooltip-format": "Temperature - {temperatureC}°C",
+	},
+	"temperature#text": {
+		"tooltip-format": "Temperature - {temperatureC}°C",
+	},
+	"cpu#icon": {
+		"format": ""
+	},
+	"cpu#text": {},
+	"clock": {
+		"format": "{:%I:%M - %b %d}" ,
+		"tooltip-format": "{:%I:%M - %B %A}" 
+	},
+	"wireplumber#icon": {
+		"format": "{icon}",
+		"format-icons": [ "", "", "", ""],
+		"tooltip-format": "{node_name} - {volume}%"
+	},
+	"wireplumber#text": {
+		"format": "{volume}%",
+		"tooltip-format": "{node_name} - {volume}%"
+	},
+	"backlight#icon": {
+		"format": "{icon}",
+		"format-icons": ["󰃞", "󰃝", "󰃟", "󰃠"],
+		"tooltip-format": "Brightness - {percent}%"
+	},
+	"backlight#text": {
+		"format": "{percent}%",
+		"tooltip-format": "Brightness - {percent}%"
+	},
+	"battery#icon": {
+		"bat": "BAT1",
+		"interval": 60,
+		"states": {
+			"good": 95,
+			"warning": 30,
+			"critical": 15
+		},
+		"format": " {icon}",
+		"format-icons": [
+			"󰁺", "󰁻", "󰁼", "󰁽", "󰁾", "󰁿", "󰂀", "󰂁", "󰂂","󰁹"
+		],
+	},
+	"battery#text": {
+		"bat": "BAT1",
+		"interval": 60,
+	},
+	"bluetooth": {
+		"format-connected": "",
+		"format-off": "󰂲",
+		"format-on": "",
+		"tooltip-format-on": "No device connected",
+		"tooltip-format-off": "Disconnected",
+		"tooltip-format-connected": "Connected - {device_alias}",
+		"tooltip-format-connected-battery": "{device_alias} - {device_battery_percentage}%",
+		"on-click": "blueman-manager"
+	},
+	"network": {
+		"format-wifi": "",
+		"format-ethernet": "",
+		"format-disconnected": "󰤭",
+		"tooltip-format": "{essid} - {signalStrength}%"
+	},
+	"custom/power": {
+		"format" : "⏻ ",
+		"tooltip": false,
+		"menu": "on-click",
+		"menu-file": "$HOME/.config/waybar/custom_modules/power_menu.xml", 
+		"menu-actions": {
+			"shutdown": "shutdown",
+			"reboot": "reboot",
+			"suspend": "systemctl suspend",
+			"hibernate": "systemctl hibernate"
+		}
+	}
+}

@@ -1,0 +1,164 @@
+@import "waybar_colors.css";
+
+@define-color bg @surface;
+@define-color ac @primary;
+
+* {
+  border: none;
+  font-family: "JetbrainsMono Nerd Font";
+  font-weight: bold;
+  text-shadow: 4px 4px 6px rgba(0,0,0,0.7); 
+  color: @ac;
+}
+
+window#waybar {
+    background-color: transparent;
+    color: #ffffff;
+    transition-property: background-color;
+    transition-duration: .5s;
+}
+
+.modules-center {
+	background-color: @bg;
+	border-color: @ac;
+	border-width: 2px;
+	border-style: solid;
+	padding: 5px 10px 5px 10px;	
+	border-radius: 8px;
+}
+
+
+#cpu.icon,
+#temperature.icon,
+#backlight.icon,
+#battery.icon,
+#wireplumber.icon {
+	background-color: @ac;
+	color: @bg;
+	border-top-left-radius: 8px;
+	border-bottom-left-radius: 8px;
+	border-left: 2px solid @ac;
+	border-top: 2px solid @ac;
+	border-bottom: 2px solid @ac;
+}
+
+#temperature.icon {
+	padding: 0px 10px 0 10px;
+}
+
+#cpu.icon {
+	padding: 0px 15px 0 10px;
+}
+
+#wireplumber.icon {
+	padding: 0px 15px 0 10px;
+}
+
+
+#backlight.icon {
+	padding: 0px 14px 0 10px;
+}
+
+
+#battery.icon {
+	padding: 0px 10px 0 4px;
+}
+
+
+
+
+#cpu.text,
+#temperature.text,
+#battery.text,
+#backlight.text,
+#wireplumber.text {
+	background-color: @bg;
+	color: @ac;
+	margin-right: 5px;
+	border-top-right-radius: 8px;
+	border-bottom-right-radius: 8px;
+	border-style: solid;
+	border-width: 2px;
+	padding: 0px 10px 0px 10px;
+}
+
+
+
+#clock {
+	color: @ac;
+}
+
+
+#custom-power,
+#network,
+#bluetooth {
+	border-color: @ac;
+	border-width: 2px;
+	border-style: solid;
+	border-radius: 8px;
+	color: @ac;
+	background-color: @bg;
+	margin-right: 5px;
+}
+
+#custom-power {
+	padding: 0px 5px 0px 10px;	
+}
+
+#network {
+	padding: 0px 18px 0px 10px;	
+}
+
+#bluetooth {
+	padding: 0px 12px 0px 10px;	
+}
+
+#custom-power:hover {
+	background-color: @ac;
+	color: @fg;
+}
+
+#workspaces {
+	border-top-left-radius: 8px;
+	border-top-right-radius: 8px;
+	border-bottom-left-radius: 8px;
+	border-bottom-right-radius: 8px;
+	background-color: @bg;
+}
+
+#workspaces button {
+	border-right: 2px solid @ac;
+	border-top: 2px solid @ac;
+	border-bottom: 2px solid @ac;
+	border-radius: 0px;
+}
+
+#workspaces button:first-child {
+	border-width: 2px; 
+	border-left: 2px solid @ac;
+	border-top-left-radius: 8px;
+	border-bottom-left-radius: 8px;
+}
+
+
+#workspaces button:last-child {
+	border-width: 2px; 
+	border-top: 2px solid @ac;
+	border-bottom: 2px solid @ac;
+	border-right: 2px solid @ac;
+	border-top-right-radius: 8px;
+	border-bottom-right-radius: 8px;
+}
+
+#workspaces .workspace-label {
+	color: @ac;
+}
+
+#workspaces button.active {
+	background-color: @ac;
+}
+
+#workspaces button.active .workspace-label {
+	color: @bg;
+}
+

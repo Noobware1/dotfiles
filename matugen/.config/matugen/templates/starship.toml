@@ -1,0 +1,68 @@
+"$schema" = 'https://starship.rs/config-schema.json'
+
+# Inserts a blank line between shell prompts
+add_newline = false
+
+format = """
+[\u256d\u2500\ue0b6](error)\
+$shell\
+[\ue0b0](bg:secondary fg:error)\
+$directory\
+[\ue0b0](bg:secondary_container fg:secondary)\
+$git_branch\
+$git_status\
+[\ue0b0](fg:secondary_container bg:tertiary)\
+$time\
+[\ue0b0](fg:tertiary)\
+\n\
+[\u2570\u2500\ue285\ueab6](fg:primary)
+"""
+
+palette = 'dark'
+
+[shell]
+unknown_indicator = 'mystery shell'
+style = 'bg:error fg:on_error'
+format = '[ $indicator ]($style)'
+disabled = false
+
+
+[os]
+disabled = false
+style = "bg:primary fg:on_primary"
+
+[os.symbols]
+Arch = "󰣇"
+
+[directory]
+style = "bg:secondary fg:on_primary"
+format = "[ \uf07b\uea9c $path ]($style)"
+truncation_length = 3
+truncation_symbol = "…/"
+
+[directory.substitutions]
+"Documents" = "󰈙 "
+"Downloads" = " "
+"Music" = "󰝚 "
+"Pictures" = " "
+"Developer" = "󰲋 "
+
+[git_branch]
+symbol = ""
+style = "bg:tertiary"
+format = '[[ $symbol $branch ](fg:on_secondary_container bg:secondary_container)]($style)'
+
+[git_status]
+style = "bg:tertiary"
+format = '[[($all_status$ahead_behind )](fg:on_secondary_container bg:secondary_container)]($style)'
+
+[time]
+disabled = false
+time_format = "%R"
+style = "bg:tertiary"
+format = '[[  $time ](fg:on_secondary bg:tertiary)]($style)'
+
+[palettes.dark]
+<* for name, value in colors *>
+{{ name }} = "{{ value.dark.hex }}"
+<* endfor *>

@@ -1,0 +1,47 @@
+[config.wallpaper]
+command = "hyprctl"
+arguments = ["hyprpaper", "reload", ","]
+set = true
+
+[templates.waybar]
+input_path = 'templates/waybar_colors.css'
+output_path = '~/.config/waybar/waybar_colors.css'
+post_hook = "pkill -x -USR2 waybar >/dev/null 2>&1 &"
+
+[templates.hyprpaper]
+input_path = 'templates/hyprpaper.conf'
+output_path = '~/.config/hypr/hyprpaper.conf'
+
+[templates.hyprland]
+input_path = 'templates/hyprland_colors.conf'
+output_path = '~/.config/hypr/hyprland_colors.conf'
+
+[templates.kitty]
+input_path = 'templates/kitty_theme.conf'
+output_path = '~/.config/kitty/themes/kitty_theme.conf'
+post_hook = "kitten themes --reload-in=all kitty theme"
+
+# [templates.oh-my-posh]
+# input_path = 'templates/oh-my-posh.json'
+# output_path = '~/.config/oh-my-posh/colors.json'
+# post_hook = "exec zsh"
+
+[templates.starship]
+input_path = 'templates/starship.toml'
+output_path = '~/.config/starship/starship.toml'
+
+[templates.pywalfox]
+input_path = 'templates/pywalfox.json'
+output_path = '~/.cache/wal/colors.json'
+post_hook = 'if pgrep -x firefox >/dev/null; then pywalfox update; fi'
+
+
+
+
+
+
+
+
+
+
+

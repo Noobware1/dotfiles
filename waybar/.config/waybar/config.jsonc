@@ -1,0 +1,19 @@
+{
+	// "height": "40",
+	"include": "modules.jsonc",
+	"modules-left": ["group/workspace"],
+	"modules-center": ["clock"],
+	"modules-right": [
+		"wireplumber#icon",
+		"wireplumber#text",
+		"backlight#icon",
+		"backlight#text",
+		"battery#icon",
+		"battery#text",
+		"bluetooth",
+		"network",
+		"custom/power"
+	],
+	"margin": "5 10 0 10"
+	// "spacing": 5
+}

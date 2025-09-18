@@ -1,0 +1,22 @@
+#compdef walrs
+
+_walrs() {
+    local context state line
+    typeset -A opt_args
+
+    _arguments \
+        '(-i --image)'{-i,--image}'[path to image or directory]:image file:_files -g "*.{jpg,jpeg,png,bmp,gif,tiff,webp}(-.)"' \
+        '(-r --reload)'{-r,--reload}'[reload without changing the wallpaper]' \
+        '(-R --reload-no)'{-R,--reload-no}'[will be removed in the next update; use -w instead]' \
+        '(-t --theme)'{-t,--theme}'[use external theme file from .config/walrs/colorschemes]:theme file:_files -g "*.json(-.)"' \
+        '(-g --generate)'{-g,--generate}'[generate & save theme to .config/walrs/colorschemes]:theme name:' \
+        '(-s --saturation)'{-s,--saturation}'[set saturation value (-128 to 127)]:saturation:({-128..127})' \
+        '(-b --brightness)'{-b,--brightness}'[set brightness value (-128 to 127)]:brightness:({-128..127})' \
+        '(-S --scripts)'{-S,--scripts}'[skip running scripts in ~/.config/walrs/scripts/]' \
+        '(-W --walless)'{-W,--walless}'[skip changing the wallpaper]' \
+        '(-q --quiet)'{-q,--quiet}'[set quit mode (no output)]' \
+        '(-v --version)'{-v,--version}'[show version]' \
+        '(--help)--help[display usage information]'
+}
+
+_walrs "$@"
