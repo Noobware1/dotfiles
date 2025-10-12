@@ -13,6 +13,9 @@ vim.api.nvim_create_autocmd("LspAttach", {
 
 		local opts = { buffer = ev.buf, silent = true }
 
+		opts.desc = "LSP Format"
+		keymap.set("n", "<leader>cf", vim.lsp.buf.format, opts) -- show definition, references
+
 		opts.desc = "Show LSP references"
 		keymap.set("n", "gr", "<cmd>Telescope lsp_references<CR>", opts) -- show definition, references
 

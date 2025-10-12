@@ -26,8 +26,11 @@ alias v="nvim"
 alias py="source ~/dev/python/bin/activate"
 alias pyq="deactivate"
 alias wal="matugen -v image"
+alias penpot="~/dev/dotfiles/penpot/penpot.sh"
+alias svgtoqml="/lib/qt6/bin/svgtoqml"
 
 bindkey -v
 bindkey "^H" backward-delete-char
 bindkey "^?" backward-delete-char
+
 fpath=(~/.zsh/completions $fpath)

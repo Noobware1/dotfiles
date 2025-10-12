@@ -9,6 +9,11 @@
 			"hyprland/workspaces"
 		]
 	},
+	// "hyprland/workspaces": {
+	// 	"persistent-workspaces": {
+	// 		"*": 5
+	// 	}
+	// },
 	"temperature#icon": {
 		"format": "{icon}",
 		"format-icons": ["", "", ""],

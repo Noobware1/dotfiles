@@ -30,6 +30,8 @@ function setup()
 			"xml",
 			"yaml",
 			"rust",
+			"dart",
+			"qmljs",
 		}
 	})
 end

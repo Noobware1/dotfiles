@@ -1,0 +1,6 @@
+{
+	<* for name, value in colors *>
+	"m3{{name | camel_case}}": "{{value.default.hex}}",
+	<* endfor *>
+	"eof": "eof"
+}

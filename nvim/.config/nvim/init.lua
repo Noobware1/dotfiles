@@ -15,9 +15,13 @@ require("plugin.comments")
 require("plugin.treesitter")
 require("plugin.mason")
 require("plugin.telescope")
+require("plugin.undotree")
+require("plugin.oil")
 
 -- Lsp
 require("lsp.config")
 require("lsp.lua_ls")
 require("lsp.dart_ls")
+require("lsp.qmlls")
 require("lsp.rust_analyzer")
+require("lsp.clangd")

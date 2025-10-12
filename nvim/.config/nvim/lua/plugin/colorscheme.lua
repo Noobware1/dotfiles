@@ -2,7 +2,8 @@ local util = require("core.util")
 
 vim.g.colorschemes = {
 	"rose-pine",
-	"kanagawa"
+	"kanagawa",
+	"gruvbox",
 }
 
 util:load_from_event(
@@ -35,6 +36,16 @@ util:load_from_event(
 	}
 )
 
+util:load_from_event(
+	"gruvbox",
+	"User",
+	{
+		pattern = "gruvbox",
+		config = function()
+			require("gruvbox").setup({})
+		end
+	}
+)
 vim.schedule(function()
 	local file = io.open(vim.g.color_file, "r")
 	if file then

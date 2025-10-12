@@ -22,6 +22,7 @@ vim.call("plug#begin")
 -- ColorSchemes
 LazyPlug("rose-pine/neovim", { ["as"] = "rose-pine" })
 LazyPlug("rebelot/kanagawa.nvim", { ["as"] = "kanagawa" })
+LazyPlug("ellisonleao/gruvbox.nvim", { ["as"] = "gruvbox" })
 
 -- Comments
 LazyPlug("folke/ts-comments.nvim")
@@ -39,5 +40,11 @@ LazyPlug("nvim-telescope/telescope.nvim")
 LazyPlug("mason-org/mason.nvim", {
 	["do"] = ":MasonUpdate"
 })
+
+-- Undotree
+Plug("mbbill/undotree")
+
+-- Oil nvim
+Plug("stevearc/oil.nvim")
 
 vim.call("plug#end")

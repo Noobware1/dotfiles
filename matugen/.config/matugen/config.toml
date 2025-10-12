@@ -21,6 +21,12 @@ input_path = 'templates/kitty_theme.conf'
 output_path = '~/.config/kitty/themes/kitty_theme.conf'
 post_hook = "kitten themes --reload-in=all kitty theme"
 
+[templates.m3colors]
+input_path = 'templates/colors.json'
+output_path = '~/.local/state/quickshell/colorscheme.json'
+# post_hook = "jq '.'  ~/.local/share/quickshell/colors.json> ~/.local/share/quickshell/tmp.json && mv ~/.local/share/quickshell/tmp.json ~/.local/share/quickshell/colors.json"
+
+
 # [templates.oh-my-posh]
 # input_path = 'templates/oh-my-posh.json'
 # output_path = '~/.config/oh-my-posh/colors.json'
