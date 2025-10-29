@@ -1,5 +1,5 @@
 vim.lsp.config("qmlls", {
-	cmd = { 'qmlls', '-E' },
+	cmd = { 'qmlls6', '-E' },
 	filetypes = { 'qml', 'qmljs' },
 	root_markers = { '.git' },
 })

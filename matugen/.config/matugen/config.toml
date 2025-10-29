@@ -23,7 +23,7 @@ post_hook = "kitten themes --reload-in=all kitty theme"
 
 [templates.m3colors]
 input_path = 'templates/colors.json'
-output_path = '~/.local/state/quickshell/colorscheme.json'
+output_path = '~/.local/state/noobshell/colorscheme.json'
 # post_hook = "jq '.'  ~/.local/share/quickshell/colors.json> ~/.local/share/quickshell/tmp.json && mv ~/.local/share/quickshell/tmp.json ~/.local/share/quickshell/colors.json"
 
 

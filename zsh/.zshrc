@@ -33,4 +33,8 @@ bindkey -v
 bindkey "^H" backward-delete-char
 bindkey "^?" backward-delete-char
 
+function ecp() {
+	"$@" 2> >(tee /dev/stderr | wl-copy)
+}
+
 fpath=(~/.zsh/completions $fpath)

@@ -1,6 +1,14 @@
 {
-	<* for name, value in colors *>
-	"m3{{name | camel_case}}": "{{value.default.hex}}",
-	<* endfor *>
-	"eof": "eof"
+	"light": {
+		<* for name, value in colors *>
+		"m3{{name | camel_case}}": "{{value.light.hex}}",
+		<* endfor *>
+		"": ""
+	},
+	"dark": {
+		<* for name, value in colors *>
+		"m3{{name | camel_case}}": "{{value.dark.hex}}",
+		<* endfor *>
+		"": ""
+	}
 }

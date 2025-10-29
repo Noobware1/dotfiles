@@ -34,5 +34,4 @@ end
 keymap.set({ "n", "v" }, "<C-_>", comment_text, { desc = "Comment line" })
 keymap.set({ "n", "v" }, "<C-/>", comment_text, { desc = "Comment line" })
 
-
 keymap.set("n", "<leader>s", "<cmd>update | source<cr>", { desc = "Source current buffer" })
