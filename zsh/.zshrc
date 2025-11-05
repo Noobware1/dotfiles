@@ -16,7 +16,7 @@ autoload -Uz compinit
 compinit
 # End of lines added by compinstall
 
-alias ls='ls --color=auto'
+alias ls='ls -la --color=auto'
 alias grep='grep --color=auto'
 # PS1='[\u@\h \W]\$ '
 
@@ -28,6 +28,7 @@ alias pyq="deactivate"
 alias wal="matugen -v image"
 alias penpot="~/dev/dotfiles/penpot/penpot.sh"
 alias svgtoqml="/lib/qt6/bin/svgtoqml"
+alias py="python3"
 
 bindkey -v
 bindkey "^H" backward-delete-char

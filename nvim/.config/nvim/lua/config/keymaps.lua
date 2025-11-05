@@ -1,6 +1,6 @@
 local keymap = vim.keymap
 
-keymap.set({ "n", "i", "s" }, "<C-h>", "<cmd>noh<cr>", { desc = "Close hlsearch" })
+keymap.set({ "n", "i", "s" }, "<leader>h", "<cmd>noh<cr>", { desc = "Close hlsearch" })
 
 keymap.set("n", "<leader>e", "<cmd>Ex<cr>", { desc = "Open explorer" })
 
