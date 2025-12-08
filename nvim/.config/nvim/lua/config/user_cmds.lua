@@ -18,13 +18,24 @@ vim.api.nvim_create_user_command("Color", function(cmd)
 		else
 			local file = io.open(vim.g.color_file, "w")
 			if file then file:write(selected) end
-			vim.g.colorscheme =  selected
-			vim.api.nvim_exec_autocmds("User", {pattern= "ColorschemeChanged"})
+			vim.g.colorscheme = selected
+			vim.api.nvim_exec_autocmds("User", { pattern = "ColorschemeChanged" })
 		end
 	else
-		vim.g.colorscheme =  vim.fn.input("Colorscheme: ") or "default"
-                vim.api.nvim_exec_autocmds("User", {pattern= "ColorschemeChanged"})
+		vim.g.colorscheme = vim.fn.input("Colorscheme: ") or "default"
+		vim.api.nvim_exec_autocmds("User", { pattern = "ColorschemeChanged" })
 	end
 end, {
 	nargs = 1
+})
+
+-- Restart lsp
+vim.api.nvim_create_user_command("RestartLsp", function()
+	for _, c in ipairs(vim.lsp.get_clients({ bufnr = 0 })) do
+		vim.lsp.enable(c.name, false)
+		vim.lsp.enable(c.name, true)
+		vim.notify(("Restarted %s"):format(c.name))
+	end
+end, {
+	nargs = 0
 })

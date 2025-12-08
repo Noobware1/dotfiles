@@ -72,7 +72,7 @@ error_container = "#93000a"
 
 inverse_on_surface = "#293234"
 
-inverse_primary = "#815600"
+inverse_primary = "#825500"
 
 inverse_surface = "#dbe4e6"
 
@@ -82,21 +82,21 @@ on_error = "#690005"
 
 on_error_container = "#ffdad6"
 
-on_primary = "#442b00"
+on_primary = "#452b00"
 
-on_primary_container = "#ffddb1"
+on_primary_container = "#ffddb3"
 
 on_primary_fixed = "#291800"
 
-on_primary_fixed_variant = "#624000"
+on_primary_fixed_variant = "#633f00"
 
-on_secondary = "#2d2d4d"
+on_secondary = "#2c2d4d"
 
-on_secondary_container = "#e2dfff"
+on_secondary_container = "#e1e0ff"
 
-on_secondary_fixed = "#181837"
+on_secondary_fixed = "#171837"
 
-on_secondary_fixed_variant = "#444465"
+on_secondary_fixed_variant = "#434465"
 
 on_surface = "#dbe4e6"
 
@@ -104,45 +104,45 @@ on_surface_variant = "#b8cacd"
 
 on_tertiary = "#00363d"
 
-on_tertiary_container = "#a9eefa"
+on_tertiary_container = "#a9eef9"
 
 on_tertiary_fixed = "#001f24"
 
-on_tertiary_fixed_variant = "#004f58"
+on_tertiary_fixed_variant = "#004f57"
 
 outline = "#839497"
 
-outline_variant = "#39494d"
+outline_variant = "#39494c"
 
-primary = "#f7bc63"
+primary = "#f9bb64"
 
-primary_container = "#624000"
+primary_container = "#633f00"
 
-primary_fixed = "#ffddb1"
+primary_fixed = "#ffddb3"
 
-primary_fixed_dim = "#f7bc63"
+primary_fixed_dim = "#f9bb64"
 
 scrim = "#000000"
 
-secondary = "#c4c3eb"
+secondary = "#c3c3eb"
 
-secondary_container = "#444465"
+secondary_container = "#434465"
 
-secondary_fixed = "#e2dfff"
+secondary_fixed = "#e1e0ff"
 
-secondary_fixed_dim = "#c4c3eb"
+secondary_fixed_dim = "#c3c3eb"
 
 shadow = "#000000"
 
-source_color = "#4d807f"
+source_color = "#518280"
 
 surface = "#0c1516"
 
-surface_bright = "#323b3d"
+surface_bright = "#323b3c"
 
 surface_container = "#182123"
 
-surface_container_high = "#232b2d"
+surface_container_high = "#222c2d"
 
 surface_container_highest = "#2d3638"
 
@@ -152,15 +152,15 @@ surface_container_lowest = "#071011"
 
 surface_dim = "#0c1516"
 
-surface_tint = "#f7bc63"
+surface_tint = "#f9bb64"
 
-surface_variant = "#39494d"
+surface_variant = "#39494c"
 
-tertiary = "#8ed1de"
+tertiary = "#8dd1dd"
 
-tertiary_container = "#004f58"
+tertiary_container = "#004f57"
 
-tertiary_fixed = "#a9eefa"
+tertiary_fixed = "#a9eef9"
 
-tertiary_fixed_dim = "#8ed1de"
+tertiary_fixed_dim = "#8dd1dd"
 

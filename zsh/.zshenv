@@ -2,6 +2,7 @@
 
 export PATH=$PATH:$HOME/.local/bin
 export PATH=$PATH:$HOME/dev/builds/flutter/bin
+export PATH=$PATH:/usr/local/android-studio/bin
 
 export CHROME_EXECUTABLE=$(which firefox)
 

@@ -16,7 +16,7 @@ autoload -Uz compinit
 compinit
 # End of lines added by compinstall
 
-alias ls='ls -la --color=auto'
+alias ls='ls --color=auto'
 alias grep='grep --color=auto'
 # PS1='[\u@\h \W]\$ '
 
