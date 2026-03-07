@@ -6,7 +6,7 @@ keymap.set("n", "<leader>e", "<cmd>Ex<cr>", { desc = "Open explorer" })
 
 keymap.set({ "n", "v" }, "<C-s>", "<cmd>w<cr>", { desc = "Write to buffer" })
 
-keymap.set("n", "<leader>r", "<cmd>restart<cr>", { desc = "Restart neovim" })
+-- keymap.set("n", "<leader>r", "<cmd>restart<cr>", { desc = "Restart neovim" })
 
 -- Move line down
 vim.keymap.set("n", "<A-j>", ":m .+1<CR>==", { desc = "Move line down", silent = true })
@@ -36,4 +36,21 @@ keymap.set({ "n", "v" }, "<C-/>", comment_text, { desc = "Comment line" })
 
 keymap.set("n", "<leader>s", "<cmd>update | source<cr>", { desc = "Source current buffer" })
 
-keymap.set("n", "<leader>r", "<cmd>RestartLsp<cr>", { desc = "Restart all active LSP for current buffer" })
+keymap.set("n", "<leader>rr", "<cmd>RestartLsp<cr>", { desc = "Restart all active LSP for current buffer" })
+
+keymap.set({ "n", "i" }, "<C-w>g", function()
+	-- Get the current file name in uppercase
+	local name = string.upper(vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ':t'))
+	name = name:gsub('%.H$', '_H') -- Replace .H at the end with _H
+
+	-- Create the header guard content
+	local guard = {
+		string.format("#ifndef %s", name),
+		string.format("#define %s", name),
+		"",
+		"#endif // " .. name
+	}
+
+	-- Insert the lines at the current cursor position
+	vim.api.nvim_put(guard, 'l', true, true) -- 'l' = linewise
+end, { desc = "Insert header guard" })
