@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import Material3
+import qs.Core
 
 Button {
     id: button
@@ -9,17 +10,22 @@ Button {
     required property bool selected
     required property real minimumWidth
     required property real maximumWidth
+    property bool expanded: false
 
-    implicitWidth: minimumWidth
+    implicitWidth: expanded ? maximumWidth : minimumWidth
     border.color: MaterialTheme.colorScheme.outlineVariant
+    width: Math.min(Math.max(implicitWidth, minimumWidth), maximumWidth)
+
+    signal dropped(MouseEvent event)
 
     icon.name: "do_not_disturb"
     text: "do not disturb"
     hoverEnabled: !editMode
 
     onClicked: {
+        console.log(Preferences.getIdk("key"));
         if (editMode) {
-            implicitWidth = implicitWidth == maximumWidth ? minimumWidth : maximumWidth;
+            // expanded = !expanded;
         }
     }
 
@@ -38,41 +44,37 @@ Button {
         }
     }
 
-    states: [
-        State {
-            name: "None"
-            PropertyChanges {
-                button {
-                    colors.backgroundColor: MaterialTheme.colorScheme.primary
-                    colors.contentColor: MaterialTheme.colorScheme.onPrimary
-                    radius: checked ? ButtonDefaults.radiusFor(containerHeight) : height / 2
-                    border.width: -1
-                }
-            }
-        },
-        State {
-            name: "Removable"
-            extend: "None"
-            when: button.editMode && !button.selected
-            PropertyChanges {
-                button {
-                    colors.backgroundColor: MaterialTheme.colorScheme.surfaceContainer
-                    colors.contentColor: MaterialTheme.colorScheme.onSurfaceVariant
-                    radius: height / 2
-                }
-            }
-        },
-        State {
-            name: "Resizable"
-            extend: "Removable"
-            when: button.editMode && button.selected
-            PropertyChanges {
-                button {
-                    border.width: 2
-                }
-            }
+    border.width: editMode && (selected || Drag.active) ? 2 : -1
+
+    radius: {
+        if (editMode) {
+            return height / 2;
         }
-    ]
+        return checked ? ButtonDefaults.radiusFor(containerHeight) : height / 2;
+    }
+
+    colors: {
+        const colorScheme = MaterialTheme.colorScheme;
+        const cols = ButtonDefaults.filledButtonColors(colorScheme, checked);
+        if (editMode) {
+            cols.backgroundColor = colorScheme.surfaceContainer;
+            cols.contentColor = colorScheme.onSurfaceVariant;
+        }
+        return cols;
+    }
+
+    MouseArea {
+        id: mouseArea
+        enabled: button.editMode
+        anchors.fill: button
+        drag.target: button
+        onReleased: event => button.dropped(event)
+    }
+
+    Drag.active: mouseArea.drag.active
+    Drag.source: button
+    Drag.hotSpot.x: width / 2
+    Drag.hotSpot.y: height / 2
 
     contentItem: RowLayout {
         spacing: 0

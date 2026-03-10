@@ -1,6 +1,7 @@
 import Quickshell
 import QtQuick
 import qs.Features.Bar
+import qs.Services
 
 ShellRoot {
     id: root
