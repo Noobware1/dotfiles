@@ -8,22 +8,28 @@ import qs.Core
 Singleton {
     id: root
 
+    function load(): void {
+        while (fileView.waitForJob()) {}
+    }
+
     FileView {
         id: fileView
         path: `${Paths.data}/preferences.json`
         watchChanges: true
         onFileChanged: reload()
-
-        readonly property var json: {
+        onLoaded: {
             const text = this.text();
             if (text.length > 0) {
                 try {
-                    return JSON.parse(text);
-                } catch (e) {
-                    console.error(e);
-                    return {};
-                }
+                    json = JSON.parse(text);
+                } catch (e) {}
             }
+        }
+
+        property var json: ({})
+
+        function get(key: string): var {
+            return json[key];
         }
 
         function set(key: string, value: var): void {
@@ -56,11 +62,15 @@ Singleton {
         fileView.set(key, value);
     }
 
+    function setObject(key: string, value: var): void {
+        fileView.set(key, value);
+    }
+
     function setStringList(key: string, value: list<string>): void {
         fileView.set(key, value);
     }
 
-    function setIntList(key: string, value: list<bool>): void {
+    function setBoolList(key: string, value: list<bool>): void {
         fileView.set(key, value);
     }
 
@@ -77,7 +87,7 @@ Singleton {
     }
 
     function getBool(key: string, defaultValue: bool): bool {
-        const value = fileView.json[key];
+        const value = fileView.get(key);
         if (value == undefined || value == null)
             return defaultValue;
 
@@ -89,7 +99,7 @@ Singleton {
     }
 
     function getInt(key: string, defaultValue: int): int {
-        const value = fileView.json[key];
+        const value = fileView.get(key);
         if (value === undefined || value === null)
             return defaultValue;
 
@@ -109,7 +119,7 @@ Singleton {
     }
 
     function __getDoubleOrReal(key: string, defaultValue: var, expected: string): var {
-        const value = fileView.json[key];
+        const value = fileView.get(key);
         if (value === undefined || value === null)
             return defaultValue;
 
@@ -121,7 +131,7 @@ Singleton {
     }
 
     function getString(key: string, defaultValue: string): string {
-        const value = fileView.json[key];
+        const value = fileView.get(key);
 
         if (value === undefined || value === null)
             return defaultValue;
@@ -154,7 +164,7 @@ Singleton {
     }
 
     function getList(key: string, defaultValue: list<var>, check: var, expected: string): list<var> {
-        const value = fileView.json[key];
+        const value = fileView.get(key);
         if (value === undefined || value === null)
             return defaultValue;
 
@@ -163,6 +173,14 @@ Singleton {
         }
 
         __incompatibleType(value, expected);
+    }
+
+    function getObject(key: string, defaultValue: var): var {
+        const value = fileView.get(key);
+        if (value === undefined || value === null)
+            return defaultValue;
+
+        return value;
     }
 
     function __incompatibleType(value, expected) {

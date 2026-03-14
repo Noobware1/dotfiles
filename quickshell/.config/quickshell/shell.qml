@@ -2,6 +2,7 @@ import Quickshell
 import QtQuick
 import qs.Features.Bar
 import qs.Services
+import qs.Core
 
 ShellRoot {
     id: root
@@ -15,5 +16,6 @@ ShellRoot {
 
     Component.onCompleted: {
         ThemeService.init();
+        Preferences.load();
     }
 }
