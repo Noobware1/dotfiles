@@ -62,6 +62,12 @@ eval "$(ssh-agent -s)"
 ssh-add ~/github
 }
 
+function for-file() {
+	local p=$1
+	shift
+	find "$p" | fzf --multi | while IFS= read -r file; do "$@" "$file"; done	
+}
+
 
 
 fpath=(~/.zsh/completions $fpath)

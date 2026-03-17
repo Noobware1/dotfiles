@@ -18,9 +18,9 @@ QuickButton {
     checked: checkable && innerChecked
     radius: ButtonDefaults.radiusFor(button.containerHeight)
 
-    contentItem: Loader {
-        sourceComponent: button.expanded ? splitToggle : iconOnly
-    }
+    // contentItem: Loader {
+    //     sourceComponent: button.expanded ? splitToggle : iconOnly
+    // }
 
     Component {
         id: iconOnly
