@@ -4,147 +4,151 @@ import qs.Features.Bar.Components
 
 QtObject {
     id: model
-    enum Button {
-        Wifi,
-        Bluetooth,
-        Dnd,
-        DarkMode,
-        PowerMode
-    }
 
-    property alias quickItemsModel: itemsModel
+    property alias itemsModel: _itemsModel
 
     readonly property list<QtObject> __internals: [
         ListModel {
-            id: itemsModel
-            signal loaded
-            signal removeItem(index: int)
-            signal moveItem(from: int, to: int, count: int)
+            id: _itemsModel
         }
     ]
 
-    signal quickItemRemove(index: int)
-
     function saveState(): void {
         let list = [];
-        for (var i = 0; i < itemsModel.count; i++) {
-            const item = itemsModel.get(i);
+        for (var i = 0; i < _itemsModel.count; i++) {
+            const item = _itemsModel.get(i);
             list.push({
                 type: item.type,
                 expanded: item.expanded
             });
         }
 
-    // Preferences.setObject("quick_items", list);
-    }
-
-    function setExpanded(index: int, expanded: bool) {
-        itemsModel.setProperty(index, "expanded", expanded);
+        Preferences.setObject("quick_items", list);
     }
 
     function removeItem(index: int) {
-        itemsModel.remove(index);
-        itemsModel.removeItem(index);
-    // __destroyIncubator(__incubators[index]);
-    // __incubators.splice(index, 1);
+        _itemsModel.remove(index, 1);
     }
 
     function moveItem(from: int, to: int) {
-        itemsModel.move(from, to, 1);
-        itemsModel.moveItem(from, to, 1);
-
-    // __incubators[from].object.index = to;
-    // const [item] = __incubators.splice(from, 1);
-    // __incubators.splice(to, 0, item);
+        _itemsModel.move(from, to, 1);
     }
 
-    // function dropItem(layout: Item, source: Item, x: real, y: real) {
-    //     const pos = source.mapToItem(layout, x, y);
-    //     const centerX = pos.x;
-    //
-    //     for (var i = 0; i < itemsModel.count; i++) {
-    //         const item = layout.children[i];
-    //         if (item === source) {
-    //             continue;
-    //         }
-    //         const itemPos = item.mapToItem(layout, item.x, item.y);
-    //         const itemCenterX = itemPos.x + (item.wtypeth / 2);
-    //         if (centerX < itemCenterX) {
-    //             itemsModel.move(source.index, i, 1);
-    //             break;
-    //         }
-    //     }
-    // }
-    //
+    function setExpanded(index: int, expanded: bool) {
+        _itemsModel.setProperty(index, "expanded", expanded);
+    }
 
     function __readItemsPrefs() {
         const prefs = Preferences.getObject("quick_items", [
             {
-                type: QuickSettingsModel.Wifi,
+                type: QuickButton.Wifi,
                 expanded: true
             },
             {
-                type: QuickSettingsModel.Bluetooth,
+                type: QuickButton.Bluetooth,
                 expanded: true
             },
             {
-                type: QuickSettingsModel.Dnd,
+                type: QuickButton.Dnd,
                 expanded: false
             },
             {
-                type: QuickSettingsModel.DarkMode,
+                type: QuickButton.DarkMode,
                 expanded: false
             },
             {
-                type: QuickSettingsModel.PowerMode,
+                type: QuickButton.PowerMode,
                 expanded: true
             }
         ]);
 
-        itemsModel.clear();
+        _itemsModel.clear();
 
         for (var i = 0; i < prefs.length; i++) {
-            itemsModel.append(prefs[i]);
+            _itemsModel.append(prefs[i]);
         }
-
-        itemsModel.loaded();
-    }
-
-    function quickItemSource(type: int): string {
-        let path = "";
-        switch (type) {
-        case QuickSettingsModel.Button.Wifi:
-            path = "WifiButton.qml";
-            break;
-        case QuickSettingsModel.Button.Bluetooth:
-            path = "BluetoothButton.qml";
-            break;
-        case QuickSettingsModel.Button.Dnd:
-            path = "DoNotDisturbButton.qml";
-            break;
-        case QuickSettingsModel.Button.DarkMode:
-            path = "DarkModeButton.qml";
-            break;
-        case QuickSettingsModel.Button.PowerMode:
-            path = "PowerModeButton.qml";
-            break;
-        default:
-            path = "";
-            break;
-        }
-
-        if (path.length > 0) {
-            path = `${Paths.shellDir}/Features/Bar/Components/QuickItems/${path}`;
-        }
-
-        return path;
-    }
-
-    function createComponent(type: int): Component {
-        return Qt.createComponent(quickItemSource(type));
     }
 
     Component.onCompleted: {
         __readItemsPrefs();
     }
 }
+
+// QtObject {
+//     id: model
+//     enum Button {
+//         Wifi,
+//         Bluetooth,
+//         Dnd,
+//         DarkMode,
+//         PowerMode
+//     }
+//
+//     property alias quickItemsModel: model
+//
+//     readonly property list<QtObject> __internals: [
+//         ListModel {
+//             id: model
+//             signal loaded
+//             signal removeItem(index: int)
+//             signal moveItem(from: int, to: int, count: int)
+//         }
+//     ]
+//
+//     signal quickItemRemove(index: int)
+//
+//
+//
+//   //
+//     function removeItem(index: int) {
+//         model.remove(index);
+//         model.removeItem(index);
+//     // __destroyIncubator(__incubators[index]);
+//     // __incubators.splice(index, 1);
+//     }
+//
+//     function moveItem(from: int, to: int) {
+//         model.move(from, to, 1);
+//         model.moveItem(from, to, 1);
+//
+//     // __incubators[from].object.index = to;
+//     // const [item] = __incubators.splice(from, 1);
+//     // __incubators.splice(to, 0, item);
+//     }
+//
+
+//
+//     function quickItemSource(type: int): string {
+//         let path = "";
+//         switch (type) {
+//         case QuickButton.Button.Wifi:
+//             path = "WifiButton.qml";
+//             break;
+//         case QuickButton.Button.Bluetooth:
+//             path = "BluetoothButton.qml";
+//             break;
+//         case QuickButton.Button.Dnd:
+//             path = "DoNotDisturbButton.qml";
+//             break;
+//         case QuickButton.Button.DarkMode:
+//             path = "DarkModeButton.qml";
+//             break;
+//         case QuickButton.Button.PowerMode:
+//             path = "PowerModeButton.qml";
+//             break;
+//         default:
+//             path = "";
+//             break;
+//         }
+//
+//         if (path.length > 0) {
+//             path = `${Paths.shellDir}/Features/Bar/Components/QuickItems/${path}`;
+//         }
+//
+//         return path;
+//     }
+//
+//     function createComponent(type: int): Component {
+//         return Qt.createComponent(quickItemSource(type));
+//     }
+/// }

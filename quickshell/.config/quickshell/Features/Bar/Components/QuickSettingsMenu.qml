@@ -3,26 +3,23 @@ import QtQuick
 import QtQuick.Layouts
 import Material3
 import qs.Features.Bar.Models
+import qs.Shared.Components
 import qs.Features.Bar.Components.QuickItems
 
 Rectangle {
     id: menu
-    property real horizontalPadding: 16
-    property real verticalPadding: 10
+    property real horizontalPadding: 8
+    property real verticalPadding: 8
     color: MaterialTheme.colorScheme.surface
-    readonly property real maxPileWidth: 200
-    readonly property real minPileWidth: (maxPileWidth / 2) - (layout.spacing / 2)
-    readonly property real pileHeight: ButtonDefaults.mediumHeight
-    border.width: -1
-    border.color: MaterialTheme.colorScheme.primary
-    implicitHeight: 700
-    implicitWidth: 600
+    implicitHeight: column.implicitHeight + (verticalPadding * 2)
+    implicitWidth: column.implicitWidth + (horizontalPadding * 2)
 
     radius: 20
 
     property bool editMode: false
+
     onEditModeChanged: {
-        // group.lastPressedButton = null;
+        group.lastPressedButton = null;
         if (!editMode) {
             menu.model.saveState();
         }
@@ -34,33 +31,65 @@ Rectangle {
 
     readonly property QuickSettingsModel model: QuickSettingsModel {}
 
-    // ButtonGroup {
-    //     id: group
-    //     exclusive: false
-    //     animate: !menu.editMode
-    //     buttons: layout.children.filter(e => e !== repeater).map(function (e) {
-    //         if (e instanceof QuickButton) {
-    //             return e;
-    //         } else {
-    //             return e.button;
-    //         }
-    //     })
-    //
-    //     property var lastPressedButton
-    //     onClicked: function (button) {
-    //         lastPressedButton = button;
-    //     }
-    // }
+    ButtonGroup {
+        id: group
+        layout: layout
+        exclusive: false
+        animate: !menu.editMode
+        buttons: layout.children.filter(e => e !== repeater).map(e => e.button)
+        property var lastPressedButton
+        onClicked: function (button) {
+            lastPressedButton = button;
+        }
+    }
+
+    Timer {
+        id: guard
+        interval: 500
+    }
 
     ColumnLayout {
         id: column
         anchors.centerIn: parent
+
         spacing: 6
+
+        Surface {
+            id: header
+            implicitHeight: 52
+            Layout.fillWidth: true
+            Layout.rightMargin: menu.horizontalPadding
+            Layout.leftMargin: menu.horizontalPadding
+
+            radius: 16
+            elevation: 2
+            color: MaterialTheme.colorScheme.surfaceContainer
+
+            RowLayout {
+                // anchors.verticalCenter: parent.verticalCenter
+                anchors.fill: parent
+                Item {
+                    Layout.fillWidth: true
+                }
+                Button {
+                    variant: ButtonVariant.Outlined
+                    icon.name: "edit"
+                    onClicked: {
+                        menu.editMode = !menu.editMode;
+                    }
+                }
+            }
+        }
 
         Rectangle {
             id: border
-            Layout.preferredHeight: layout.height + 24
-            Layout.preferredWidth: layout.width + 24
+            Layout.topMargin: menu.editMode ? 10 : 0
+            Layout.rightMargin: menu.horizontalPadding
+            Layout.leftMargin: menu.horizontalPadding
+
+            Layout.preferredHeight: layout.height + (menu.verticalPadding * 2)
+            Layout.preferredWidth: menu.editMode ? layout.width + (menu.horizontalPadding * 2) : layout.width
+
             radius: 24
             color: "transparent"
 
@@ -70,104 +99,57 @@ Rectangle {
             Flow {
                 id: layout
                 anchors.centerIn: parent
+                readonly property real maxPileWidth: 200
+                readonly property real minPileWidth: (maxPileWidth / 2) - (layout.spacing / 2)
+                readonly property real pileHeight: ButtonDefaults.mediumHeight
+                readonly property real expandedHeight: (layout.pileHeight * 6) + (spacing * 5)
 
-                height: (menu.pileHeight * 3) + (spacing * 2)
-                width: (menu.maxPileWidth * 2) + spacing + 1
+                height: menu.editMode ? expandedHeight : implicitHeight
+                width: (layout.maxPileWidth * 2) + spacing + 1
                 spacing: 6
 
                 Repeater {
                     id: repeater
-                    model: DelegateModel {
-                        id: visualModel
-                        model: menu.model.quickItemsModel
-                        delegate: DelegateChooser {
-                            role: "type"
-                            choices: [
-                                ButtonDelegate {
-                                    roleValue: QuickSettingsModel.Wifi
-                                    WifiButton {
-                                        minimumWidth: menu.minPileWidth
-                                        maximumWidth: menu.maxPileWidth
-                                        containerHeight: menu.pileHeight
-                                        implicitHeight: menu.pileHeight
-                                    }
-                                },
-                                ButtonDelegate {
-                                    roleValue: QuickSettingsModel.Bluetooth
-                                    BluetoothButton {
-                                        minimumWidth: menu.minPileWidth
-                                        maximumWidth: menu.maxPileWidth
-                                        containerHeight: menu.pileHeight
-                                        implicitHeight: menu.pileHeight
-                                    }
-                                },
-                                ButtonDelegate {
-                                    roleValue: QuickSettingsModel.Dnd
-                                    DoNotDisturbButton {
-                                        minimumWidth: menu.minPileWidth
-                                        maximumWidth: menu.maxPileWidth
-                                        containerHeight: menu.pileHeight
-                                        implicitHeight: menu.pileHeight
-                                    }
-                                },
-                                ButtonDelegate {
-                                    roleValue: QuickSettingsModel.DarkMode
-                                    DarkModeButton {
-                                        minimumWidth: menu.minPileWidth
-                                        maximumWidth: menu.maxPileWidth
-                                        containerHeight: menu.pileHeight
-                                        implicitHeight: menu.pileHeight
-                                    }
-                                },
-                                ButtonDelegate {
-                                    roleValue: QuickSettingsModel.PowerMode
-                                    PowerModeButton {
-                                        minimumWidth: menu.minPileWidth
-                                        maximumWidth: menu.maxPileWidth
-                                        containerHeight: menu.pileHeight
-                                        implicitHeight: menu.pileHeight
-                                    }
-                                }
-                            ]
-                        }
-                    }
-
-                    property bool entered: false
-
-                    onItemAdded: function (_, item) {
-                        const button = item.button as QuickButton;
-
-                        button.editMode = Qt.binding(() => menu.editMode);
-                        // button.expanded = Qt.binding(() => item.expanded);
-                        button.selected = Qt.binding(() => true);
-                        // button.dragParent = Qt.binding(() => ghost);
-                        button.drag.connect(function (x, y) {
-                            const item = repeater.itemAt(0);
-                            const centerX = item.x + item.width / 2;
-                            const centerY = item.y + item.height / 2;
-
-                            const pos = button.mapToItem(layout, x, y);
-                            if (pos.x < centerX && pos.y <= centerY) {
-                                if (repeater.entered) {
-                                    return;
-                                }
-                                visualModel.items.move(button.index, item.index);
-                                repeater.entered = true;
+                    model: menu.model.itemsModel
+                    DelegateChooser {
+                        role: "type"
+                        choices: [
+                            ButtonDelegate {
+                                roleValue: QuickButton.Wifi
+                                WifiButton {}
+                            },
+                            ButtonDelegate {
+                                roleValue: QuickButton.Bluetooth
+                                BluetoothButton {}
+                            },
+                            ButtonDelegate {
+                                roleValue: QuickButton.Dnd
+                                DoNotDisturbButton {}
+                            },
+                            ButtonDelegate {
+                                roleValue: QuickButton.DarkMode
+                                DarkModeButton {}
+                            },
+                            ButtonDelegate {
+                                roleValue: QuickButton.PowerMode
+                                PowerModeButton {}
                             }
-                        });
+                        ]
                     }
-                }
 
-                Item {
-                    id: ghost
-                    height: children[0]?.height ?? 0
-                    width: children[0]?.width ?? 0
+                    onItemAdded: function (_idx, item) {
+                        const button = item.button as QuickButton;
+                        button.drag.connect(function (x, y) {
+                            menu.onButtonDrag(button, x, y);
+                        });
+                        button.remove.connect(menu.model.removeItem);
+                        button.expandedChanged.connect(menu.model.setExpanded);
+                    }
                 }
 
                 move: Transition {
                     enabled: menu.editMode
                     NumberAnimation {
-
                         properties: "x,y"
                         easing.bezierCurve: MotionSpecs.expressiveDefaultSpatialBezier
                         easing.type: Easing.BezierSpline
@@ -177,133 +159,138 @@ Rectangle {
             }
         }
 
-        RowLayout {
-            id: footer
+        Slider {
+            id: volumeSlider
+            Layout.rightMargin: menu.horizontalPadding
+            Layout.leftMargin: menu.horizontalPadding
+
             Layout.fillWidth: true
-            Item {
-                Layout.fillWidth: true
-            }
-            Button {
-                variant: ButtonVariant.Outlined
-                icon.name: "edit"
-                onClicked: {
-                    menu.editMode = !menu.editMode;
-                }
-            }
+            trackHeight: SliderDefaults.mediumTrackHeight
+            stopIndicatorItem: null
+            icon.name: "volume_up"
+        }
+
+        Slider {
+            id: brightnessSlider
+            Layout.rightMargin: menu.horizontalPadding
+            Layout.leftMargin: menu.horizontalPadding
+
+            Layout.fillWidth: true
+            trackHeight: SliderDefaults.mediumTrackHeight
+            stopIndicatorItem: null
+            icon.name: "brightness_7"
         }
     }
-
-    // component ButtonDelegate: DelegateChoice {}
 
     component ButtonDelegate: DelegateChoice {
         id: choice
         default property Component buttonDelegate
-        Item {
+        Rectangle {
             id: dropArea
+            color: index == menu.__swapableIndex ? MaterialTheme.colorScheme.primary : "transparent"
+            radius: height / 2
 
-            property int index: DelegateModel.itemsIndex
-            required property var modelData
+            required property int index
+            required property bool expanded
 
-            height: menu.pileHeight
+            height: button.height
             width: button.width
-
-            states: State {
-                when: button.Drag.active
-                PropertyChanges {
-                    dropArea.z: 1000
-                }
-            }
 
             property QuickButton button: choice.buttonDelegate.createObject(dropArea, {
                 index: Qt.binding(() => dropArea.index),
-                expanded: Qt.binding(() => dropArea.modelData.expanded),
+                expanded: Qt.binding(() => dropArea.expanded),
                 editMode: Qt.binding(() => menu.editMode),
-                // selected: Qt.binding(() => group.lastPressedButton === dropArea.button),
-                selected: Qt.binding(() => true),
-                dragParent: Qt.binding(() => dropArea),
-                containerHeight: Qt.binding(() => menu.pileHeight),
-                maximumWidth: Qt.binding(() => menu.maxPileWidth),
-                minimumWidth: Qt.binding(() => menu.minPileWidth)
+                selected: Qt.binding(() => group.lastPressedButton === dropArea.button),
+                dragParent: Qt.binding(() => menu),
+                containerHeight: Qt.binding(() => layout.pileHeight),
+                implicitHeight: Qt.binding(() => layout.pileHeight),
+                maximumWidth: Qt.binding(() => layout.maxPileWidth),
+                minimumWidth: Qt.binding(() => layout.minPileWidth)
             }) as QuickButton
         }
     }
 
-    // component ButtonDelegate: DelegateChoice {
-    //     id: choice
-    //     default property Component buttonDelegate
-    //     DropArea {
-    //         id: dropArea
-    //
-    //         property int index: DelegateModel.itemsIndex
-    //         required property var modelData
-    //
-    //         height: menu.pileHeight
-    //         width: button.Drag.active ? menu.maxPileWidth : button.width
-    //         // width: button.width
-    //
-    //         // onPositionChanged: function (drag) {
-    //         //     if (!(drag.source instanceof QuickButton))
-    //         //         return;
-    //         //
-    //         //     const source = drag.source as QuickButton;
-    //         //     if (source === button)
-    //         //         return;
-    //         //
-    //         //     const sourceIndex = source.index;
-    //         //     const targetIndex = index;
-    //         //
-    //         //     // center of dragged item in Flow coordinates
-    //         //     const sourcePos = source.mapToItem(layout, source.width / 2, source.height / 2);
-    //         //     const dragCenterX = sourcePos.x;
-    //         //     const dragCenterY = sourcePos.y;
-    //         //
-    //         //     // center of target item
-    //         //     const targetCenterX = dropArea.x + dropArea.width / 2;
-    //         //     const targetCenterY = dropArea.y + dropArea.height / 2;
-    //         //
-    //         //     // ensure both items are on the same row
-    //         //     const sameRow = Math.abs(dragCenterY - targetCenterY) < dropArea.height / 2;
-    //         //
-    //         //     if (!sameRow)
-    //         //         return;
-    //         //
-    //         //     if (sourceIndex < targetIndex && dragCenterX > targetCenterX + 8) {
-    //         //         visualModel.items.move(sourceIndex, targetIndex);
-    //         //     }
-    //         //
-    //         //     if (sourceIndex > targetIndex && dragCenterX < targetCenterX - 8) {
-    //         //         visualModel.items.move(sourceIndex, targetIndex);
-    //         //     }
-    //         // }
-    //         // onHeightChanged: {
-    //         //     console.log("height: ", height);
-    //         // }
-    //         // onWidthChanged: {
-    //         //     console.log("WIDTH ", width);
-    //         // }
-    //         //
-    //         onEntered: function (drag) {
-    //             if (!(drag.source instanceof QuickButton))
-    //                 return;
-    //
-    //             const source = drag.source as QuickButton;
-    //             if (source === button)
-    //                 return;
-    //
-    //             visualModel.items.move(source.index, dropArea.index);
-    //         }
-    //
-    //         property QuickButton button: choice.buttonDelegate.createObject(dropArea, {
-    //             index: Qt.binding(() => dropArea.index),
-    //             expanded: Qt.binding(() => dropArea.modelData.expanded),
-    //             editMode: Qt.binding(() => menu.editMode),
-    //             // selected: Qt.binding(() => group.lastPressedButton === dropArea.button),
-    //             selected: Qt.binding(() => true),
-    //             dragParent: Qt.binding(() => layout),
-    //             containerHeight: Qt.binding(() => menu.pileHeight),
-    //             maximumWidth: Qt.binding(() => menu.maxPileWidth),
-    //             minimumWidth: Qt.binding(() => menu.minPileWidth)
-    //         }) as QuickButton
-    //     }
-    // }
+    property int __swapableIndex: -1
+
+    function onButtonDrag(button, x, y) {
+        if (guard.running)
+            return;
+
+        const pos = button.mapToItem(layout, x, y);
+
+        const rowHeight = layout.pileHeight;
+        const row = Math.floor(pos.y / rowHeight);
+
+        const rowTop = row * rowHeight;
+        const rowBottom = rowTop + rowHeight;
+
+        const rowItems = [];
+
+        var rowFound = false;
+
+        for (let i = 0; i < repeater.count; i++) {
+            const child = repeater.itemAt(i);
+
+            if (!child || child.button === button)
+                continue;
+
+            if (child.y >= rowTop && child.y <= rowBottom) {
+                rowFound = true;
+                rowItems.push(child);
+                continue;
+            }
+
+            if (rowFound) {
+                break;
+            }
+        }
+
+        if (rowItems.length === 0)
+            return;
+
+        const dragCenter = pos.x;
+
+        let targetIndex = -1;
+
+        const endSpace = layout.width - button.width + layout.spacing;
+        for (let i = 0; i < rowItems.length; i++) {
+            const current = rowItems[i];
+
+            const itemLeft = current.x;
+            const itemRight = current.x + current.width;
+
+            let overlap = dragCenter > itemLeft && dragCenter < itemRight;
+
+            if (!overlap) {
+                if (i == rowItems.length - 1 && !button.expanded && dragCenter > itemRight && itemRight <= endSpace && rowItems.length >= 2 && (repeater.itemAt(current.index + 1)?.expanded ?? false)) {
+                    targetIndex = current.index + 1;
+                    break;
+                }
+
+                continue;
+            }
+
+            if (i == 0 && current.expanded && !button.expanded) {
+                const prevItem = repeater.itemAt(current.index - 1);
+                if (prevItem && prevItem.button != button) {
+                    const prevItemRight = (prevItem.x + prevItem.width);
+                    if (prevItemRight > (layout.width / 2) && prevItem <= endSpace) {
+                        console.log(current.button);
+                        break;
+                    }
+                    //empty space up top
+                }
+            }
+
+            targetIndex = current.index;
+            break;
+        }
+
+        if (targetIndex == -1) {
+            return;
+        }
+
+        menu.model.moveItem(button.index, targetIndex);
+        guard.start();
+    }
 }

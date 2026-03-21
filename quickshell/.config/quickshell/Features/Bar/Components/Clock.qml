@@ -3,6 +3,7 @@ import QtQuick
 import Material3
 
 Button {
+    id: button
     SystemClock {
         id: clock
         precision: SystemClock.Seconds

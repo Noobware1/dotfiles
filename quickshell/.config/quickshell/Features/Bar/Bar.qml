@@ -3,6 +3,7 @@ import Quickshell.Wayland
 import QtQuick
 import Material3
 import qs.Features.Bar.Components
+import qs.Shared.Components
 import qs.Features.Bar
 
 PanelWindow {
@@ -38,9 +39,18 @@ PanelWindow {
             font: BarConfig.font
         }
 
-        Clock {
+        // Clock {
+        //     anchors.centerIn: parent
+        //     height: bar.heightWithMargin
+        // }
+
+        Marquee {
             anchors.centerIn: parent
-            height: bar.heightWithMargin
+            textString: "hello world"
+            font.pixelSize: 14
+            verticalAlignment: Text.AlignVCenter
+            horizontalAlignment: Text.AlignHCenter
+            color: MaterialTheme.colorScheme.onSurface
         }
 
         QuickSettings {
