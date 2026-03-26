@@ -5,6 +5,7 @@ import Material3
 
 Button {
     id: button
+
     enum Type {
         Wifi,
         Bluetooth,
@@ -12,10 +13,12 @@ Button {
         DarkMode,
         PowerMode
     }
+
     anchors {
         verticalCenter: parent.verticalCenter
         horizontalCenter: parent.horizontalCenter
     }
+
     required property real minimumWidth
     required property real maximumWidth
     required property int index
@@ -25,7 +28,8 @@ Button {
     property bool editMode: false
     property bool selected: false
 
-    checkable: !expanded
+    checkable: !expanded && !editMode
+    checked: checkable && false
 
     width: Math.min(Math.max(implicitWidth, minimumWidth), maximumWidth)
     implicitWidth: expanded ? maximumWidth : minimumWidth
@@ -48,12 +52,17 @@ Button {
 
     colors: {
         const colorScheme = MaterialTheme.colorScheme;
-        const cols = ButtonDefaults.filledButtonColors(colorScheme, checked);
-        if (editMode) {
-            cols.backgroundColor = colorScheme.surfaceContainer;
-            cols.contentColor = colorScheme.onSurfaceVariant;
+
+        if (checkable && !editMode) {
+            return ButtonDefaults.filledButtonColors(MaterialTheme.colorScheme, checked);
         }
-        return cols;
+
+        return M3.buttonColors({
+            backgroundColor: colorScheme.surfaceContainer,
+            contentColor: colorScheme.onSurfaceVariant,
+            disbaledBackgroundColor: Qt.alpha(colorScheme.surface, 0.1),
+            disbaledBackgroundColor: Qt.alpha(colorScheme.onSurfaceVariant, 0.38)
+        });
     }
 
     // Remove button
@@ -84,6 +93,7 @@ Button {
             }
         }
         property bool dragActive: false
+        property real value: 0
 
         sourceComponent: Item {
             Item {
@@ -92,6 +102,7 @@ Button {
                 property real value: (dragHandle.x - __resizeDrag.drag.minimumX) / (__resizeDrag.drag.maximumX - __resizeDrag.drag.minimumX)
                 onValueChanged: {
                     button.implicitWidth = button.minimumWidth + value * (button.maximumWidth - button.minimumWidth);
+                    resizeHandle.value = value;
                 }
 
                 anchors.verticalCenter: parent.verticalCenter
@@ -125,31 +136,32 @@ Button {
 
             Rectangle {
                 anchors.verticalCenter: parent.verticalCenter
-                height: button.implicitHeight / 3
-                width: 5
-                radius: 2
+                height: 16
+                width: 6
+                radius: width / 2
                 color: MaterialTheme.colorScheme.primary
                 x: button.width - width
             }
         }
     }
+    clip: true
 
     contentItem: RowLayout {
-        spacing: 0
         Item {
             Layout.fillWidth: true
         }
         Icon {
             name: button.icon.name
-            font.family: "Material Symbols Rounded"
             size: button.icon.width
+
             color: enabled ? button.colors.contentColor : button.colors.disabledContentColor
+            Layout.alignment: Qt.AlignVCenter
         }
         Label {
             Layout.leftMargin: button.spacing
+            visible: (button.editMode && button.width > button.minimumWidth + 10) || (!button.editMode && button.expanded)
             text: button.text
             color: enabled ? button.colors.contentColor : button.colors.disabledContentColor
-            visible: button.expanded
         }
         Item {
             Layout.fillWidth: true
@@ -173,7 +185,8 @@ Button {
                 const pos = centroid.position;
                 button.drag(pos.x, pos.y);
             }
-            // else if (centroid.position.x == 0 && centroid.position.y == 0) {}
+            // else if (centroid.position.x == 0 && centroid.position.y == 0) {
+            // }
         }
     }
 

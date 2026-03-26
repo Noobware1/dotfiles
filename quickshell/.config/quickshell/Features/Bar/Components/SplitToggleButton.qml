@@ -10,46 +10,94 @@ QuickButton {
     implicitHeight: containerHeight
     verticalPadding: 0
     horizontalPadding: 0
-    property bool innerChecked: false
 
-    readonly property button_colors iconButtonColors: ButtonDefaults.filledButtonColors(MaterialTheme.colorScheme, innerChecked)
-
-    checkable: !expanded
-    checked: checkable && innerChecked
-    radius: ButtonDefaults.radiusFor(button.containerHeight)
-
-    contentItem: Loader {
-        sourceComponent: button.expanded ? splitToggle : iconOnly
-    }
-
-    Component {
-        id: iconOnly
-        Icon {
-            name: button.icon.name
-            size: button.icon.width
+    colors: {
+        const colorScheme = MaterialTheme.colorScheme;
+        const cols = ButtonDefaults.filledButtonColors(colorScheme, checkable && checked);
+        if (editMode) {
+            cols.backgroundColor = colorScheme.surfaceContainer;
+            cols.contentColor = colorScheme.onSurfaceVariant;
         }
+        return cols;
     }
 
-    Component {
-        id: splitToggle
-        RowLayout {
-            spacing: button.spacing
-            Button {
-                id: iconToggle
-                Layout.leftMargin: ButtonDefaults.smallHorizontalPadding / 2
-                checkable: true
-                checked: button.innerChecked
-                Layout.alignment: Qt.AlignVCenter
-                radius: iconToggle.checked ? ButtonDefaults.radiusFor(iconToggle.containerHeight) : height / 2
-                verticalPadding: ButtonDefaults.smallVerticalPadding
-                icon: button.icon
+    readonly property button_colors iconButtonColors: {
+        const colorScheme = MaterialTheme.colorScheme;
+        let backgroundColor;
+        let contentColor;
+        if (button.checked && !button.editMode) {
+            backgroundColor = colorScheme.primary;
+            contentColor = colorScheme.onPrimary;
+        } else {
+            backgroundColor = colorScheme.surfaceVariant;
+            contentColor = colorScheme.onSurfaceVariant;
+        }
+
+        return M3.buttonColors({
+            backgroundColor: backgroundColor,
+            disabledBackgroundColor: Qt.alpha(colorScheme.onSurfaceVariant, 0.1),
+            contentColor: contentColor,
+            disabledContentColor: Qt.alpha(colorScheme.onSurfaceVariant, 0.38)
+        });
+    }
+
+    radius: ButtonDefaults.radiusFor(button.containerHeight)
+    readonly property button_colors _colors: button.expanded ? button.iconButtonColors : button.colors
+
+    contentItem: RowLayout {
+        spacing: button.spacing
+        Rectangle {
+            Layout.alignment: Qt.AlignVCenter
+            // Layout.preferredWidth:
+            radius: button.checked ? ButtonDefaults.radiusFor(height) : height / 2
+            Layout.fillHeight: true
+            Layout.topMargin: button.expanded ? 5 : 0
+            Layout.bottomMargin: Layout.topMargin
+            Layout.leftMargin: Layout.topMargin
+            Layout.fillWidth: !button.expanded
+
+            Behavior on radius {
+                NumberAnimation {
+                    easing.bezierCurve: MotionSpecs.expressiveFastSpatialBezier
+                    duration: MotionSpecs.expressiveFastSpatialDuration
+                    easing.type: Easing.BezierSpline
+                }
             }
-            Label {
-                text: button.text
-                font: button.font
-                color: button.colors.contentColor
-                Layout.fillWidth: true
+
+            implicitWidth: ButtonDefaults.minimumWidth
+
+            color: {
+                if (!button.expanded) {
+                    return "transparent";
+                }
+                return enabled ? button._colors.backgroundColor : button._colors.disabledBackgroundColor;
             }
+
+            Icon {
+                anchors.centerIn: parent
+                name: button.icon.name
+                color: {
+                    return enabled ? button._colors.contentColor : button._colors.disabledContentColor;
+                }
+                size: button.icon.width
+            }
+
+            TapHandler {
+                enabled: button.expanded
+                target: parent
+                onTapped: {
+                    button.checked = !button.checked;
+                    button.toggled();
+                }
+            }
+        }
+
+        Label {
+            visible: button.width > button.maximumWidth / 1.5
+            text: button.text
+            font: button.font
+            color: button.colors.contentColor
+            Layout.fillWidth: true
         }
     }
 }

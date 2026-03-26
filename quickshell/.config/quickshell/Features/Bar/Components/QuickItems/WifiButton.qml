@@ -1,7 +1,9 @@
 import qs.Features.Bar.Components
 
-SplitToggleButton {
+QuickButton {
     icon.name: "wifi"
     text: "PlaceHolder"
-    innerChecked: true
+    onToggled: {
+        console.log(checked);
+    }
 }

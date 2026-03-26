@@ -1,7 +1,6 @@
 import qs.Features.Bar.Components
 
-SplitToggleButton {
+QuickButton {
     icon.name: "bluetooth"
     text: "PlaceHolder"
-    innerChecked: true
 }

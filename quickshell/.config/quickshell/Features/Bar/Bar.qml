@@ -39,19 +39,19 @@ PanelWindow {
             font: BarConfig.font
         }
 
-        // Clock {
-        //     anchors.centerIn: parent
-        //     height: bar.heightWithMargin
-        // }
-
-        Marquee {
+        Clock {
             anchors.centerIn: parent
-            textString: "hello world"
-            font.pixelSize: 14
-            verticalAlignment: Text.AlignVCenter
-            horizontalAlignment: Text.AlignHCenter
-            color: MaterialTheme.colorScheme.onSurface
+            height: bar.heightWithMargin
         }
+
+        // Marquee {
+        //     anchors.centerIn: parent
+        //     textString: "hello world"
+        //     font.pixelSize: 14
+        //     verticalAlignment: Text.AlignVCenter
+        //     horizontalAlignment: Text.AlignHCenter
+        //     color: MaterialTheme.colorScheme.onSurface
+        // }
 
         QuickSettings {
             anchors.right: parent.right

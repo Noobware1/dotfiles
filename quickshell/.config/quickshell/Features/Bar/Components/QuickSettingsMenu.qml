@@ -14,6 +14,36 @@ Rectangle {
     implicitHeight: column.implicitHeight + (verticalPadding * 2)
     implicitWidth: column.implicitWidth + (horizontalPadding * 2)
 
+    NumberAnimation {
+        id: _animation
+        target: menu
+        running: true
+        property: "y"
+        easing.bezierCurve: MotionSpecs.expressiveDefaultSpatialBezier
+        easing.type: Easing.BezierSpline
+        duration: MotionSpecs.expressiveDefaultSpatialDuration
+        from: -menu.implicitHeight
+        to: 0
+        onFinished: {
+            if (menu.__closing) {
+                menu.__closing = false;
+                menu.closed();
+            }
+        }
+    }
+
+    property bool __closing: false
+
+    signal closed
+
+    function close() {
+        _animation.to = -menu.implicitHeight;
+        _animation.from = 0;
+        __closing = true;
+        _animation.start();
+        menu.model.saveState();
+    }
+
     radius: 20
 
     property bool editMode: false
@@ -25,10 +55,6 @@ Rectangle {
         }
     }
 
-    Component.onDestruction: {
-        menu.model.saveState();
-    }
-
     readonly property QuickSettingsModel model: QuickSettingsModel {}
 
     ButtonGroup {
@@ -36,7 +62,7 @@ Rectangle {
         layout: layout
         exclusive: false
         animate: !menu.editMode
-        buttons: layout.children.filter(e => e !== repeater).map(e => e.button)
+        buttons: layout.children.filter(e => e !== repeater).sort((a, b) => a.index - b.index).map(e => e.button)
         property var lastPressedButton
         onClicked: function (button) {
             lastPressedButton = button;
@@ -50,10 +76,12 @@ Rectangle {
 
     ColumnLayout {
         id: column
-        anchors.centerIn: parent
+        anchors.horizontalCenter: parent.horizontalCenter
 
         spacing: 6
-
+        Item {
+            implicitHeight: menu.verticalPadding
+        }
         Surface {
             id: header
             implicitHeight: 52
@@ -88,7 +116,7 @@ Rectangle {
             Layout.leftMargin: menu.horizontalPadding
 
             Layout.preferredHeight: layout.height + (menu.verticalPadding * 2)
-            Layout.preferredWidth: menu.editMode ? layout.width + (menu.horizontalPadding * 2) : layout.width
+            Layout.preferredWidth: layout.width + (menu.horizontalPadding * 2)
 
             radius: 24
             color: "transparent"
@@ -105,7 +133,7 @@ Rectangle {
                 readonly property real expandedHeight: (layout.pileHeight * 6) + (spacing * 5)
 
                 height: menu.editMode ? expandedHeight : implicitHeight
-                width: (layout.maxPileWidth * 2) + spacing + 1
+                width: (layout.maxPileWidth * 2) + spacing + 5
                 spacing: 6
 
                 Repeater {
@@ -143,7 +171,8 @@ Rectangle {
                             menu.onButtonDrag(button, x, y);
                         });
                         button.remove.connect(menu.model.removeItem);
-                        button.expandedChanged.connect(menu.model.setExpanded);
+                        button.expandedChanged.connect(() => menu.model.setExpanded(button.index, button.expanded));
+                        button.toggled.connect(() => menu.model.setToggled(button.index, button.checked));
                     }
                 }
 
@@ -192,6 +221,7 @@ Rectangle {
 
             required property int index
             required property bool expanded
+            required property bool toggled
 
             height: button.height
             width: button.width
@@ -205,6 +235,7 @@ Rectangle {
                 containerHeight: Qt.binding(() => layout.pileHeight),
                 implicitHeight: Qt.binding(() => layout.pileHeight),
                 maximumWidth: Qt.binding(() => layout.maxPileWidth),
+                checked: Qt.binding(() => dropArea.toggled),
                 minimumWidth: Qt.binding(() => layout.minPileWidth)
             }) as QuickButton
         }

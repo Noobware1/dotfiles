@@ -37,37 +37,47 @@ Button {
     }
 
     onPressed: {
-        popup.visible = !popup.visible;
-        grab.active = popup.visible;
+        if (popupLoader.active) {
+            (popupLoader.item as QuickMenuPopup).menu.close();
+        } else {
+            popupLoader.loading = true;
+        }
     }
 
-    PopupWindow {
+    LazyLoader {
+        id: popupLoader
+        QuickMenuPopup {}
+    }
+
+    component QuickMenuPopup: PopupWindow {
         id: popup
         readonly property point offset: settings.parent.mapFromItem(settings, settings.pressX, settings.pressY)
         anchor.window: settings.window
         anchor.rect.x: offset.x
         anchor.rect.y: settings.window.implicitHeight
-
-        implicitHeight: menuLoader.implicitHeight
-        implicitWidth: menuLoader.implicitWidth
+        // implicitHeight: Screen.height - anchor.rect.y
+        implicitHeight: menu.implicitHeight
+        implicitWidth: menu.implicitWidth
         color: "transparent"
-        visible: false
+        visible: true
 
-        Loader {
-            id: menuLoader
-            active: popup.visible
-            // id: menu
-            sourceComponent: QuickSettingsMenu {}
+        property alias menu: _menu
+
+        QuickSettingsMenu {
+            id: _menu
+            onClosed: {
+                popupLoader.active = false;
+            }
+            // anchors.fill: parent
         }
 
         HyprlandFocusGrab {
             id: grab
-            active: false
-
+            active: popupLoader.active
             windows: [popup]
             onActiveChanged: {
                 if (!active) {
-                    popup.visible = false;
+                    _menu.close();
                 }
             }
         }
