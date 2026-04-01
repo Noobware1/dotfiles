@@ -10,6 +10,7 @@ QtObject {
     readonly property list<QtObject> __internals: [
         ListModel {
             id: _itemsModel
+            signal loaded
         }
     ]
 
@@ -69,14 +70,116 @@ QtObject {
                 type: QuickButton.PowerMode,
                 expanded: true,
                 toggled: false
-            }
+            },
+
+            ///
+            {
+                type: QuickButton.Wifi,
+                expanded: true,
+                toggled: true
+            },
+            {
+                type: QuickButton.Bluetooth,
+                expanded: true,
+                toggled: false
+            },
+            {
+                type: QuickButton.Dnd,
+                expanded: false,
+                toggled: false
+            },
+            {
+                type: QuickButton.DarkMode,
+                expanded: false,
+                toggled: false
+            },
+            {
+                type: QuickButton.PowerMode,
+                expanded: true,
+                toggled: false
+            },
+            {
+                type: QuickButton.Wifi,
+                expanded: true,
+                toggled: true
+            },
+            {
+                type: QuickButton.Bluetooth,
+                expanded: true,
+                toggled: false
+            },
+            {
+                type: QuickButton.Dnd,
+                expanded: false,
+                toggled: false
+            },
+            {
+                type: QuickButton.DarkMode,
+                expanded: false,
+                toggled: false
+            },
+            {
+                type: QuickButton.PowerMode,
+                expanded: true,
+                toggled: false
+            },
+            {
+                type: QuickButton.Wifi,
+                expanded: true,
+                toggled: true
+            },
+            {
+                type: QuickButton.Bluetooth,
+                expanded: true,
+                toggled: false
+            },
+            {
+                type: QuickButton.Dnd,
+                expanded: false,
+                toggled: false
+            },
+            {
+                type: QuickButton.DarkMode,
+                expanded: false,
+                toggled: false
+            },
+            {
+                type: QuickButton.PowerMode,
+                expanded: true,
+                toggled: false
+            },
+            {
+                type: QuickButton.Wifi,
+                expanded: true,
+                toggled: true
+            },
+            {
+                type: QuickButton.Bluetooth,
+                expanded: true,
+                toggled: false
+            },
+            {
+                type: QuickButton.Dnd,
+                expanded: false,
+                toggled: false
+            },
+            {
+                type: QuickButton.DarkMode,
+                expanded: false,
+                toggled: false
+            },
+            {
+                type: QuickButton.PowerMode,
+                expanded: true,
+                toggled: false
+            },
         ]);
 
         _itemsModel.clear();
 
-        for (var i = 0; i < prefs.length; i++) {
-            _itemsModel.append(prefs[i]);
-        }
+        _itemsModel.append(prefs);
+
+        _itemsModel.loaded();
     }
 
     Component.onCompleted: {

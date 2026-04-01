@@ -11,6 +11,7 @@ PanelWindow {
     anchors.top: true
     anchors.right: true
     anchors.left: true
+    focusable: true
 
     // implicitHeight: BarConfig.height
     readonly property real roundedCornerSize: 0

@@ -1,6 +1,6 @@
 import qs.Features.Bar.Components
 
-QuickButton {
+SplitToggleButton {
     icon.name: "bluetooth"
     text: "PlaceHolder"
 }

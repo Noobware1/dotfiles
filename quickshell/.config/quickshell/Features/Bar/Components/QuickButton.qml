@@ -14,16 +14,13 @@ Button {
         PowerMode
     }
 
-    anchors {
-        verticalCenter: parent.verticalCenter
-        horizontalCenter: parent.horizontalCenter
-    }
-
     required property real minimumWidth
     required property real maximumWidth
     required property int index
     required property bool expanded
-    required property Item dragParent
+    property Item dragParent
+
+    // anchors.centerIn: editMode ? parent : undefined
 
     property bool editMode: false
     property bool selected: false
@@ -33,6 +30,7 @@ Button {
 
     width: Math.min(Math.max(implicitWidth, minimumWidth), maximumWidth)
     implicitWidth: expanded ? maximumWidth : minimumWidth
+    implicitHeight: containerHeight
 
     border.color: MaterialTheme.colorScheme.outlineVariant
 
@@ -47,7 +45,7 @@ Button {
         if (editMode) {
             return height / 2;
         }
-        return checked ? ButtonDefaults.radiusFor(containerHeight) : height / 2;
+        return checkable && checked ? ButtonDefaults.radiusFor(containerHeight) : height / 2;
     }
 
     colors: {
@@ -84,7 +82,7 @@ Button {
 
     // Resize handle
     Loader {
-        id: resizeHandle
+        id: resizeHandleLoader
         active: button.editMode && button.selected && !dragHandler.active
         anchors.verticalCenter: parent.verticalCenter
         onActiveChanged: {
@@ -92,61 +90,16 @@ Button {
                 button.implicitWidth = Qt.binding(() => button.expanded ? button.maximumWidth : button.minimumWidth);
             }
         }
-        property bool dragActive: false
-        property real value: 0
+        property bool dragActive: handle?.dragActive ?? false
+        property real value: handle?.value ?? 0
+        property ResizeHandle handle: item as ResizeHandle
 
-        sourceComponent: Item {
-            Item {
-                id: dragHandle
-
-                property real value: (dragHandle.x - __resizeDrag.drag.minimumX) / (__resizeDrag.drag.maximumX - __resizeDrag.drag.minimumX)
-                onValueChanged: {
-                    button.implicitWidth = button.minimumWidth + value * (button.maximumWidth - button.minimumWidth);
-                    resizeHandle.value = value;
-                }
-
-                anchors.verticalCenter: parent.verticalCenter
-                height: button.implicitHeight / 2.5
-                width: 15
-                x: button.width - width
-
-                Drag.active: __resizeDrag.drag.active
-                Drag.hotSpot.x: width / 2
-                Drag.hotSpot.y: height / 2
-            }
-
-            MouseArea {
-                id: __resizeDrag
-                propagateComposedEvents: true
-                parent: dragHandle
-                anchors.fill: dragHandle
-                drag.target: dragHandle
-                drag.axis: Drag.XAxis
-                drag.minimumX: button.minimumWidth - dragHandle.width
-                drag.maximumX: button.maximumWidth - dragHandle.width
-                drag.onActiveChanged: {
-                    resizeHandle.dragActive = drag.active;
-                }
-                onReleased: function (event) {
-                    event.accepted = true;
-                    button.expanded = dragHandle.value > 0.5;
-                    dragHandle.x = button.expanded ? drag.maximumX : drag.minimumX;
-                }
-            }
-
-            Rectangle {
-                anchors.verticalCenter: parent.verticalCenter
-                height: 16
-                width: 6
-                radius: width / 2
-                color: MaterialTheme.colorScheme.primary
-                x: button.width - width
-            }
-        }
+        sourceComponent: ResizeHandle {}
     }
-    clip: true
 
     contentItem: RowLayout {
+        spacing: 0
+        clip: button.editMode
         Item {
             Layout.fillWidth: true
         }
@@ -155,7 +108,6 @@ Button {
             size: button.icon.width
 
             color: enabled ? button.colors.contentColor : button.colors.disabledContentColor
-            Layout.alignment: Qt.AlignVCenter
         }
         Label {
             Layout.leftMargin: button.spacing
@@ -204,12 +156,59 @@ Button {
             target: button
             parent: button.dragParent
         }
-        AnchorChanges {
-            target: button
-            anchors {
-                horizontalCenter: undefined
-                verticalCenter: undefined
+        // AnchorChanges {
+        //     target: button
+        //     anchors {
+        //         horizontalCenter: undefined
+        //         verticalCenter: undefined
+        //     }
+        // }
+    }
+
+    component ResizeHandle: Item {
+        id: resizeHandle
+        property alias dragActive: __resizeDrag.drag.active
+        property real value: (dragHandle.x - __resizeDrag.drag.minimumX) / (__resizeDrag.drag.maximumX - __resizeDrag.drag.minimumX)
+        onValueChanged: {
+            button.implicitWidth = button.minimumWidth + value * (button.maximumWidth - button.minimumWidth);
+        }
+
+        Item {
+            id: dragHandle
+
+            anchors.verticalCenter: parent.verticalCenter
+            height: button.implicitHeight / 2.5
+            width: 15
+            x: button.width - width
+
+            Drag.active: __resizeDrag.drag.active
+            Drag.hotSpot.x: width / 2
+            Drag.hotSpot.y: height / 2
+        }
+
+        MouseArea {
+            id: __resizeDrag
+            propagateComposedEvents: true
+            parent: dragHandle
+            anchors.fill: dragHandle
+            drag.target: dragHandle
+            drag.axis: Drag.XAxis
+            drag.minimumX: button.minimumWidth - dragHandle.width
+            drag.maximumX: button.maximumWidth - dragHandle.width
+            onReleased: function (event) {
+                event.accepted = true;
+                button.expanded = resizeHandle.value > 0.5;
+                dragHandle.x = button.expanded ? drag.maximumX : drag.minimumX;
             }
+        }
+
+        Rectangle {
+            anchors.verticalCenter: parent.verticalCenter
+            height: 16
+            width: 6
+            radius: width / 2
+            color: MaterialTheme.colorScheme.primary
+            x: button.width - width
         }
     }
 }

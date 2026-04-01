@@ -40,13 +40,14 @@ Button {
         if (popupLoader.active) {
             (popupLoader.item as QuickMenuPopup).menu.close();
         } else {
-            popupLoader.loading = true;
+            popupLoader.active = true;
         }
     }
 
-    LazyLoader {
+    Loader {
         id: popupLoader
-        QuickMenuPopup {}
+        active: false
+        sourceComponent: QuickMenuPopup {}
     }
 
     component QuickMenuPopup: PopupWindow {
@@ -58,6 +59,7 @@ Button {
         // implicitHeight: Screen.height - anchor.rect.y
         implicitHeight: menu.implicitHeight
         implicitWidth: menu.implicitWidth
+
         color: "transparent"
         visible: true
 

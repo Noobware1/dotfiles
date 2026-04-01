@@ -19,13 +19,13 @@ Item {
         anchors.fill: rect
 
         Shadow {
-            data: surface.__shadows[0]
+            _data: surface.__shadows[0]
         }
         Shadow {
-            data: surface.__shadows[1]
+            _data: surface.__shadows[1]
         }
         Shadow {
-            data: surface.__shadows[2]
+            _data: surface.__shadows[2]
         }
     }
 
@@ -36,13 +36,13 @@ Item {
     }
 
     component Shadow: RectangularShadow {
-        required property var data
+        required property var _data
         visible: surface.elevation > 0 && surface.enabled
         radius: surface.radius
         anchors.fill: parent
-        offset.y: data.offset
-        blur: data.blur
-        spread: data.spread
-        color: data.color
+        offset.y: _data.offset
+        blur: _data.blur
+        spread: _data.spread
+        color: _data.color
     }
 }
