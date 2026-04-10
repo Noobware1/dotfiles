@@ -6,17 +6,29 @@ import Material3
 
 Item {
     id: surface
-    property real elevation: 0
-    // color: "red"
-    property var __shadows: Elevation.shadowsFor(elevation)
-    property alias radius: rect.radius
-    property alias color: rect.color
+    final property real elevation: 0
+    final property alias radius: rect.radius
+    final property alias color: rect.color
+    final property real implicitContentHeight
+    final property real implicitContentWidth
+
+    final property real horizontalPadding
+    final property real verticalPadding
+
+    readonly property var __shadows: Elevation.shadowsFor(elevation)
+
+    implicitHeight: implicitContentHeight ? implicitContentHeight + (verticalPadding * 2) + maxElevationOffset : 0
+    implicitWidth: implicitContentWidth ? implicitContentWidth + horizontalPadding * 2 : 0
+
+    property real maxElevationSpread: (__shadows.length ? __shadows.reduce((max, o) => o.spread > max ? o.spread : max, -Infinity) : 0)
+
+    property real maxElevationOffset: (__shadows.length ? __shadows.reduce((max, o) => o.offset > max ? o.offset : max, -Infinity) : 0)
 
     Item {
         id: shadows
         enabled: surface.enabled
         visible: surface.elevation > 0 && enabled
-        anchors.fill: rect
+        anchors.fill: surface
 
         Shadow {
             _data: surface.__shadows[0]
@@ -31,7 +43,8 @@ Item {
 
     Rectangle {
         id: rect
-        anchors.fill: parent
+        height: surface.height - surface.maxElevationOffset
+        width: surface.width
         color: MaterialTheme.colorScheme.surface
     }
 

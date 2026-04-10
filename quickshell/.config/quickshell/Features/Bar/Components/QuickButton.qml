@@ -14,10 +14,12 @@ Button {
         PowerMode
     }
 
-    required property real minimumWidth
-    required property real maximumWidth
     required property int index
-    required property bool expanded
+    required property var modelData
+    property real minimumWidth
+    property real maximumWidth
+
+    property bool expanded: modelData.expanded
     property Item dragParent
 
     // anchors.centerIn: editMode ? parent : undefined
@@ -26,7 +28,7 @@ Button {
     property bool selected: false
 
     checkable: !expanded && !editMode
-    checked: checkable && false
+    checked: modelData.checked
 
     width: Math.min(Math.max(implicitWidth, minimumWidth), maximumWidth)
     implicitWidth: expanded ? maximumWidth : minimumWidth
@@ -40,6 +42,9 @@ Button {
     signal drag(x: real, y: real)
 
     border.width: editMode && (selected || dragHandler.active) ? 2 : -1
+    readonly property real iconSize: expanded ? ButtonDefaults.smallIconSize : ButtonDefaults.mediumIconSize
+    icon.width: iconSize
+    icon.height: iconSize
 
     radius: {
         if (editMode) {
@@ -104,6 +109,7 @@ Button {
             Layout.fillWidth: true
         }
         Icon {
+            font.hintingPreference: Font.PreferNoHinting
             name: button.icon.name
             size: button.icon.width
 

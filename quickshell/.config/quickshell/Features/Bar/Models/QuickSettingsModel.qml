@@ -1,6 +1,7 @@
 import QtQuick
 import qs.Core
 import qs.Features.Bar.Components
+import qs.Services
 
 QtObject {
     id: model
@@ -21,7 +22,7 @@ QtObject {
             list.push({
                 type: item.type,
                 expanded: item.expanded,
-                toggled: item.toggled
+                checked: item.checked
             });
         }
 
@@ -40,8 +41,8 @@ QtObject {
         _itemsModel.setProperty(index, "expanded", expanded);
     }
 
-    function setToggled(index: int, toggled: bool) {
-        _itemsModel.setProperty(index, "toggled", toggled);
+    function setToggled(index: int, checked: bool) {
+        _itemsModel.setProperty(index, "checked", checked);
     }
 
     function __readItemsPrefs() {
@@ -49,129 +50,154 @@ QtObject {
             {
                 type: QuickButton.Wifi,
                 expanded: true,
-                toggled: true
+                checked: true
             },
             {
                 type: QuickButton.Bluetooth,
                 expanded: true,
-                toggled: false
+                checked: false
             },
             {
                 type: QuickButton.Dnd,
                 expanded: false,
-                toggled: false
+                checked: false
             },
             {
                 type: QuickButton.DarkMode,
                 expanded: false,
-                toggled: false
+                checked: false
             },
             {
                 type: QuickButton.PowerMode,
                 expanded: true,
-                toggled: false
+                checked: false
             },
 
-            ///
+            /////
             {
                 type: QuickButton.Wifi,
                 expanded: true,
-                toggled: true
+                checked: true
             },
             {
                 type: QuickButton.Bluetooth,
                 expanded: true,
-                toggled: false
+                checked: false
             },
             {
                 type: QuickButton.Dnd,
                 expanded: false,
-                toggled: false
+                checked: false
             },
             {
                 type: QuickButton.DarkMode,
                 expanded: false,
-                toggled: false
+                checked: false
             },
             {
                 type: QuickButton.PowerMode,
                 expanded: true,
-                toggled: false
+                checked: false
             },
             {
                 type: QuickButton.Wifi,
                 expanded: true,
-                toggled: true
+                checked: true
             },
             {
                 type: QuickButton.Bluetooth,
                 expanded: true,
-                toggled: false
+                checked: false
             },
             {
                 type: QuickButton.Dnd,
                 expanded: false,
-                toggled: false
+                checked: false
             },
             {
                 type: QuickButton.DarkMode,
                 expanded: false,
-                toggled: false
+                checked: false
             },
             {
                 type: QuickButton.PowerMode,
                 expanded: true,
-                toggled: false
+                checked: false
             },
             {
                 type: QuickButton.Wifi,
                 expanded: true,
-                toggled: true
+                checked: true
             },
             {
                 type: QuickButton.Bluetooth,
                 expanded: true,
-                toggled: false
+                checked: false
             },
             {
                 type: QuickButton.Dnd,
                 expanded: false,
-                toggled: false
+                checked: false
             },
             {
                 type: QuickButton.DarkMode,
                 expanded: false,
-                toggled: false
+                checked: false
             },
             {
                 type: QuickButton.PowerMode,
                 expanded: true,
-                toggled: false
+                checked: false
             },
             {
                 type: QuickButton.Wifi,
                 expanded: true,
-                toggled: true
+                checked: true
             },
             {
                 type: QuickButton.Bluetooth,
                 expanded: true,
-                toggled: false
+                checked: false
             },
             {
                 type: QuickButton.Dnd,
                 expanded: false,
-                toggled: false
+                checked: false
             },
             {
                 type: QuickButton.DarkMode,
                 expanded: false,
-                toggled: false
+                checked: false
             },
             {
                 type: QuickButton.PowerMode,
                 expanded: true,
-                toggled: false
+                checked: false
+            },
+            {
+                type: QuickButton.Wifi,
+                expanded: true,
+                checked: true
+            },
+            {
+                type: QuickButton.Bluetooth,
+                expanded: true,
+                checked: false
+            },
+            {
+                type: QuickButton.Dnd,
+                expanded: false,
+                checked: false
+            },
+            {
+                type: QuickButton.DarkMode,
+                expanded: false,
+                checked: false
+            },
+            {
+                type: QuickButton.PowerMode,
+                expanded: true,
+                checked: false
             },
         ]);
 
@@ -184,5 +210,20 @@ QtObject {
 
     Component.onCompleted: {
         __readItemsPrefs();
+    }
+
+    readonly property real volume: AudioService.volume
+
+    // property var __a: Timer {
+    //     interval: 500
+    //     running: true
+    //     repeat: true
+    //     onTriggered: {
+    //         console.log(model.volume);
+    //     }
+    // }
+
+    function setVolume(value: real) {
+        AudioService.setVolume(value);
     }
 }

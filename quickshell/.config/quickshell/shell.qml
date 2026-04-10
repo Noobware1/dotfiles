@@ -5,6 +5,7 @@ import Material3
 import qs.Features.Bar
 import qs.Services
 import qs.Core
+import qs.Features.OSD
 import qs.Features.Bar.Components
 import qs.Features.Bar.Models
 
@@ -17,6 +18,8 @@ ShellRoot {
     }
 
     Bar {}
+
+    VolumeOverlay {}
     // QuickTest {}
 
     // PanelWindow {

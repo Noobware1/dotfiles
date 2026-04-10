@@ -6,6 +6,8 @@ import Quickshell.Hyprland
 import Quickshell.Services.UPower
 import Material3
 import qs.Features.Bar.Components
+import qs.Features.Bar.Views
+import qs.Core
 
 Button {
     id: settings
@@ -40,14 +42,27 @@ Button {
         if (popupLoader.active) {
             (popupLoader.item as QuickMenuPopup).menu.close();
         } else {
-            popupLoader.active = true;
+            popupLoader.loading = true;
         }
     }
 
-    Loader {
+    // Timer {
+    //     id: delay
+    //     interval: 100
+    //     onTriggered: function (): void {
+    //         (popupLoader.item as QuickMenuPopup).menu.open();
+    //     }
+    // }
+
+    LazyLoader {
         id: popupLoader
-        active: false
-        sourceComponent: QuickMenuPopup {}
+        onActiveChanged: {
+            GlobalState.quickSettingsMenuOpen = active;
+            // if (active) {
+            //     delay.restart();
+            // }
+        }
+        QuickMenuPopup {}
     }
 
     component QuickMenuPopup: PopupWindow {
@@ -65,18 +80,18 @@ Button {
 
         property alias menu: _menu
 
-        QuickSettingsMenu {
+        QuickSettingsView {
             id: _menu
-            onClosed: {
+            onExited: {
                 popupLoader.active = false;
             }
-            // anchors.fill: parent
+            explicit: false
         }
 
         HyprlandFocusGrab {
             id: grab
-            active: popupLoader.active
-            windows: [popup]
+            active: true
+            windows: [popup, settings.window]
             onActiveChanged: {
                 if (!active) {
                     _menu.close();

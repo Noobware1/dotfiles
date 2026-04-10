@@ -8,7 +8,7 @@ QuickButton {
     id: button
     verticalPadding: 0
     horizontalPadding: 0
-    property real margin: 5
+    property real margin: 6
     property bool maybeExpanded: (button.editMode && button.width > button.minimumWidth + 10) || (!button.editMode && button.expanded)
 
     radius: {
