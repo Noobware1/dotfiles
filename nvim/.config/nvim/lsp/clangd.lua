@@ -48,7 +48,7 @@ end
 ---@field offsetEncoding? string
 
 ---@type vim.lsp.Config
-vim.lsp.config("clangd", {
+return {
   cmd = { 'clangd' },
   filetypes = { 'c', 'cpp', 'objc', 'objcpp', 'cuda' },
   root_markers = {
@@ -83,6 +83,5 @@ vim.lsp.config("clangd", {
       symbol_info(bufnr, client)
     end, { desc = 'Show symbol info' })
   end,
-})
+}
 
-vim.lsp.enable("clangd")

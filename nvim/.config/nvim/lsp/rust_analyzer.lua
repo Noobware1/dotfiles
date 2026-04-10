@@ -54,7 +54,7 @@ local function is_library(fname)
 end
 
 ---@type vim.lsp.Config
-vim.lsp.config("rust_analyzer", {
+return {
 	cmd = { 'rust-analyzer' },
 	filetypes = { 'rust' },
 	root_dir = function(bufnr, on_dir)
@@ -132,6 +132,5 @@ vim.lsp.config("rust_analyzer", {
 		end
 
 	}
-})
+}
 
-vim.lsp.enable("rust_analyzer")

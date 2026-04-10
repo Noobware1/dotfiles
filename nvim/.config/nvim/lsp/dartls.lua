@@ -4,7 +4,7 @@
 ---
 --- Language server for dart.
 
-vim.lsp.config("dart_ls", {
+return {
 	cmd = { 'dart', 'language-server', '--protocol=lsp' },
 	filetypes = { 'dart' },
 	root_markers = { 'pubspec.yaml' },
@@ -21,6 +21,5 @@ vim.lsp.config("dart_ls", {
 			showTodos = true,
 		},
 	},
-})
+}
 
-vim.lsp.enable("dart_ls")

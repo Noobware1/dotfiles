@@ -9,7 +9,7 @@
 --  Kotlin.
 
 ---@type vim.lsp.Config
-vim.lsp.config("kotlin-lsp", {
+return {
 	filetypes = { 'kotlin' },
 	cmd = { 'kotlin-lsp', '--stdio' },
 	root_markers = {
@@ -20,6 +20,5 @@ vim.lsp.config("kotlin-lsp", {
 		'build.gradle.kts', -- Gradle
 		'workspace.json', -- Used to integrate your own build system
 	},
-})
+}
 
-vim.lsp.enable("kotlin-lsp")

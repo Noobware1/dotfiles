@@ -2,16 +2,31 @@ local keymap = vim.keymap
 
 vim.api.nvim_create_autocmd("LspAttach", {
 	group = vim.api.nvim_create_augroup("UserLspConfig", { clear = true }),
-	callback = function(ev)
-		local client = vim.lsp.get_client_by_id(ev.data.client_id)
+	callback = function(args)
+		local client = vim.lsp.get_client_by_id(args.data.client_id)
 
 		if client:supports_method("textDocument/completion") then
-			vim.o.completeopt = "menu,menuone,noinsert,fuzzy,popup"
-			vim.lsp.completion.enable(true, client.id, ev.buf, { autotrigger = true })
+			vim.o.completeopt = "menuone,noinsert,fuzzy"
+			vim.lsp.completion.enable(true, client.id, args.buf, { autotrigger = true })
 			keymap.set({ "n", "i" }, "<C-d>", vim.lsp.completion.get)
 		end
 
-		local opts = { buffer = ev.buf, silent = true }
+		local opts = { buffer = args.buf, silent = true }
+
+		local function confirm_completion()
+			if vim.fn.pumvisible() ~= 0 then
+				-- If the completion menu is open, confirm selection
+				return '<C-y>'
+			else
+				-- If menu is closed, behave like a normal Tab
+				return nil
+			end
+		end
+
+		opts.desc = "LSP Confirm Completion"
+		keymap.set({ "n", "i" }, "<Tab>", function() return confirm_completion() or "<Tab>" end, { expr = true })
+		keymap.set({ "n", "i" }, "<Right>", function() return confirm_completion() or "<Right>" end,
+			{ expr = true })
 
 		opts.desc = "LSP Format"
 		keymap.set("n", "<leader>cf", vim.lsp.buf.format, opts) -- show definition, references
@@ -58,6 +73,14 @@ vim.api.nvim_create_autocmd("LspAttach", {
 })
 
 vim.diagnostic.config({
+	virtual_text = true,
+	underline = true,
+	update_in_insert = true,
+	severity_sort = true,
+	float = {
+		border = "rounded",
+		source = true
+	},
 	signs = {
 		text = {
 			[vim.diagnostic.severity.ERROR] = " ",
@@ -66,4 +89,14 @@ vim.diagnostic.config({
 			[vim.diagnostic.severity.INFO] = " ",
 		},
 	},
+})
+
+vim.lsp.enable({
+	"lua_ls",
+	"clangd",
+	"dartls",
+	"kotlin-lsp",
+	"qmlls",
+	"rust_analyzer",
+	"pyright",
 })
