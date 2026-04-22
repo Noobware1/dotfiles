@@ -17,34 +17,42 @@ LazyLoader {
     property bool autoHide: true
     property int duration: timer.interval
 
-    readonly property list<QtObject> __internals: [
-        Timer {
-            id: timer
-            interval: MotionSpecs.durationExtraLong4
-            function maybeRestart(): void {
-                if (loader.autoHide) {
-                    timer.restart();
-                }
-            }
-            onTriggered: function () {
-                if (loader.autoHide) {
-                    loader.hide();
-                }
+    // readonly property list<QtObject> __internals: [
+    //
+    // ]
+
+    readonly property Timer __timer: Timer {
+        id: timer
+        interval: MotionSpecs.durationExtraLong4
+        function maybeRestart(): void {
+            if (loader.autoHide) {
+                timer.restart();
             }
         }
-    ]
+        onTriggered: function () {
+            if (loader.autoHide) {
+                loader.hide();
+            }
+        }
+    }
 
     function show() {
-        if (loader.active && timer.running) {
-            (loader.item as Overlay).show();
+        if (loader.active) {
+            const overlay = loader.item as Overlay;
+            if (overlay.hovered) {
+                return;
+            }
+            overlay.dismissable.open();
             timer.maybeRestart();
         }
         loader.loading = true;
     }
 
     function hide() {
-        const overlay = loader.item as Overlay;
-        overlay.hide();
+        if (active) {
+            const overlay = loader.item as Overlay;
+            overlay.dismissable.close();
+        }
     }
 
     Overlay {}
@@ -59,26 +67,23 @@ LazyLoader {
             bottom: true
         }
 
-        implicitHeight: surface.implicitHeight + 20
-        implicitWidth: surface.implicitWidth
+        implicitHeight: __dismissable.implicitHeight + LayoutSemenatics.compactMargin // bottomPadding
+        implicitWidth: __dismissable.implicitWidth
 
         color: "transparent"
 
-        function show() {
-            surface.open();
-        }
-
-        function hide() {
-            surface.close();
-        }
+        readonly property alias dismissable: __dismissable
+        readonly property alias hovered: hoverHandler.hovered
 
         Dismissable {
-            id: surface
+            id: __dismissable
             horizontalPadding: LayoutSemenatics.horizontalPaddingMedium
             verticalPadding: LayoutSemenatics.verticalPaddingMedium
 
+            elevation: 6
+
             HoverHandler {
-                id: mouse
+                id: hoverHandler
                 onHoveredChanged: {
                     if (hovered) {
                         timer.stop();
@@ -89,32 +94,19 @@ LazyLoader {
             }
 
             y: overlay.implicitHeight
-            states: [
-                State {
-                    name: "opened"
-                    PropertyChanges {
-                        surface {
-                            y: 0
-                        }
-                    }
-                },
-                State {
-                    name: "closed"
-                    PropertyChanges {
-                        surface {
-                            y: overlay.implicitHeight
-                        }
-                    }
-                }
-            ]
+
             enter: Transition {
                 DefaultAnimation {
-                    target: surface
+                    target: __dismissable
+                    from: overlay.implicitHeight
+                    to: 0
                 }
             }
             exit: Transition {
                 DefaultAnimation {
-                    target: surface
+                    target: __dismissable
+                    from: 0
+                    to: overlay.implicitHeight
                 }
             }
             contentItem: Loader {
@@ -122,8 +114,8 @@ LazyLoader {
                 sourceComponent: loader.contentItem
             }
             delay: 0
-            onEntered: timer.maybeRestart()
-            onExited: {
+            onAboutToShow: timer.maybeRestart()
+            onClosed: {
                 loader.loading = false;
                 loader.active = false;
             }

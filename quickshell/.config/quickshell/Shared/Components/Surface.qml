@@ -15,20 +15,36 @@ Item {
     final property real horizontalPadding
     final property real verticalPadding
 
-    readonly property var __shadows: Elevation.shadowsFor(elevation)
+    readonly property list<shadow_elevation> __shadows: Elevation.shadowsFor(elevation)
 
-    implicitHeight: implicitContentHeight ? implicitContentHeight + (verticalPadding * 2) + maxElevationOffset : 0
+    implicitHeight: implicitContentHeight ? implicitContentHeight + (verticalPadding * 2) : 0
     implicitWidth: implicitContentWidth ? implicitContentWidth + horizontalPadding * 2 : 0
 
-    property real maxElevationSpread: (__shadows.length ? __shadows.reduce((max, o) => o.spread > max ? o.spread : max, -Infinity) : 0)
+    default property alias delegatedChildren: delegate.data
 
-    property real maxElevationOffset: (__shadows.length ? __shadows.reduce((max, o) => o.offset > max ? o.offset : max, -Infinity) : 0)
+    readonly property size elevationSize: {
+        if (!__shadows.length) {
+            return Qt.size(0, 0);
+        } else {
+            let spread = 0;
+            let blur = 0;
+            let offset = 0;
+            for (var i = 0; i < __shadows.length; i++) {
+                const e = __shadows[i];
+                spread = Math.max(spread, e.spread);
+                blur = Math.max(blur, e.blur);
+                offset = Math.max(offset, e.offset);
+            }
+            // width and height
+            return Qt.size(spread, spread + blur + offset);
+        }
+    }
 
     Item {
         id: shadows
         enabled: surface.enabled
         visible: surface.elevation > 0 && enabled
-        anchors.fill: surface
+        anchors.fill: rect
 
         Shadow {
             _data: surface.__shadows[0]
@@ -43,14 +59,22 @@ Item {
 
     Rectangle {
         id: rect
-        height: surface.height - surface.maxElevationOffset
+        height: surface.height
         width: surface.width
         color: MaterialTheme.colorScheme.surface
+
+        Item {
+            id: delegate
+            anchors.fill: parent
+            anchors.topMargin: surface.verticalPadding
+            anchors.bottomMargin: surface.verticalPadding
+            anchors.leftMargin: surface.horizontalPadding
+            anchors.rightMargin: surface.horizontalPadding
+        }
     }
 
     component Shadow: RectangularShadow {
         required property var _data
-        visible: surface.elevation > 0 && surface.enabled
         radius: surface.radius
         anchors.fill: parent
         offset.y: _data.offset

@@ -17,6 +17,7 @@ ColumnLayout {
     required property real spaceBetween
     required property int maxColumns
     required property real contentPadding
+    required property C.StackView navigatingStack
     signal setChecked(int index, bool checked)
 
     C.SwipeView {
@@ -140,6 +141,8 @@ ColumnLayout {
                     containerHeight: root.buttonHeight
                     maximumWidth: root.buttonMaxWidth
                     minimumWidth: root.buttonMinWidth
+                    menuHeight: root.buttonHeight * 6 + root.spacing * 5
+                    navigatingStack: root.navigatingStack
                 }
             },
             DelegateChoice {

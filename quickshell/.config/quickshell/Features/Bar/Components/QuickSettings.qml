@@ -7,6 +7,7 @@ import Quickshell.Services.UPower
 import Material3
 import qs.Features.Bar.Components
 import qs.Features.Bar.Views
+import Material3.internals
 import qs.Core
 
 Button {
@@ -16,6 +17,7 @@ Button {
     containerHeight: height
     implicitHeight: containerHeight
     spacing: 5
+    colors.contentColor: MaterialTheme.colorScheme.onSurfaceVariant
     required property PanelWindow window
     required property real iconSize
 
@@ -46,21 +48,10 @@ Button {
         }
     }
 
-    // Timer {
-    //     id: delay
-    //     interval: 100
-    //     onTriggered: function (): void {
-    //         (popupLoader.item as QuickMenuPopup).menu.open();
-    //     }
-    // }
-
     LazyLoader {
         id: popupLoader
         onActiveChanged: {
             GlobalState.quickSettingsMenuOpen = active;
-            // if (active) {
-            //     delay.restart();
-            // }
         }
         QuickMenuPopup {}
     }
@@ -70,10 +61,9 @@ Button {
         readonly property point offset: settings.parent.mapFromItem(settings, settings.pressX, settings.pressY)
         anchor.window: settings.window
         anchor.rect.x: offset.x
-        anchor.rect.y: settings.window.implicitHeight
-        // implicitHeight: Screen.height - anchor.rect.y
-        implicitHeight: menu.implicitHeight
-        implicitWidth: menu.implicitWidth
+        anchor.rect.y: settings.window.implicitHeight + 2
+        implicitHeight: menu.implicitHeight + 12
+        implicitWidth: menu.implicitWidth + 12
 
         color: "transparent"
         visible: true
@@ -82,10 +72,13 @@ Button {
 
         QuickSettingsView {
             id: _menu
-            onExited: {
+
+            anchors.horizontalCenter: parent.horizontalCenter
+
+            onClosed: {
                 popupLoader.active = false;
+                grab.active = false;
             }
-            explicit: false
         }
 
         HyprlandFocusGrab {

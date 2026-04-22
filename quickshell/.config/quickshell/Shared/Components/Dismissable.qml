@@ -3,55 +3,129 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import Material3
 import qs.Shared.Components
-import qs.Core
 
 Surface {
-    id: surface
+    id: root
 
     required property Item contentItem
+
     property bool explicit: false
     property alias delay: delayOpen.interval
+    property Transition enter: Transition {}
+    property Transition exit: Transition {}
+
+    implicitContentHeight: contentItem.implicitHeight
+    implicitContentWidth: contentItem.implicitWidth
+
+    color: MaterialTheme.colorScheme.surface
+    radius: height / 2
+    elevation: 0
+
+    signal opened
+    signal closed
+    signal aboutToShow
+    signal aboutToHide
+
+    readonly property string __openStateName: "open"
+    readonly property string __closeStateName: "close"
+
+    property alias openState: __openState
+    property alias closeState: __closeState
+
+    states: [
+        State {
+            id: __openState
+
+            name: root.__openStateName
+        },
+        State {
+            id: __closeState
+            name: root.__closeStateName
+        }
+    ]
+
+    transitions: [enter, exit]
 
     Timer {
         id: delayOpen
         interval: 100
+
         onTriggered: function (): void {
-            surface.open();
+            root.open();
+        }
+    }
+
+    // ===== Bindings =====
+    Binding {
+        root {
+            enter.to: root.__openStateName
+            exit.to: root.__closeStateName
         }
     }
 
     Binding {
-        target: surface.contentItem
+        target: root.contentItem
         property: "parent"
-        value: surface
+        value: root
+    }
+
+    // ===== Functions =====
+    function open(): void {
+        root.state = root.__openStateName;
+        aboutToShow();
+    }
+
+    function close(): void {
+        if (root.state == root.__closeStateName && root.exit.running) {
+            return;
+        }
+        root.state = root.__closeStateName;
+        root.clip = true;
+        aboutToHide();
+    }
+
+    // ===== Connections =====
+    Connections {
+        target: root.enter
+        function onRunningChanged() {
+            if (root.state == root.__openStateName && !root.enter.running) {
+                root.opened();
+            }
+        }
     }
 
     Connections {
-        target: surface
-        function onContentItemChanged(): void {
-            if (surface.explicit) {
-                return;
+        target: root.exit
+        function onRunningChanged() {
+            if (root.state == root.__closeStateName && !root.exit.running) {
+                root.closed();
             }
+        }
+    }
+
+    Connections {
+        target: root
+
+        function onContentItemChanged(): void {
+            if (root.explicit)
+                return;
+            if (root.contentItem instanceof Loader)
+                return;
 
             delayOpen.restart();
         }
 
-        Component.onCompleted: {
-            onContentItemChanged();
-        }
+        Component.onCompleted: onContentItemChanged()
     }
 
     Connections {
-        target: surface.contentItem
+        target: root.contentItem
+        enabled: target instanceof Loader
         ignoreUnknownSignals: true
-        function onStatusChanged() {
-            if (surface.explicit) {
-                return;
-            }
 
-            if (!(target instanceof Loader)) {
+        function onStatusChanged() {
+            if (root.explicit)
                 return;
-            }
 
             if ((target as Loader).status === Loader.Ready) {
                 delayOpen.restart();
@@ -59,70 +133,9 @@ Surface {
         }
 
         Component.onCompleted: {
-            onStatusChanged();
-        }
-    }
-
-    implicitContentHeight: contentItem.implicitHeight
-    implicitContentWidth: contentItem.implicitWidth
-
-    color: MaterialTheme.colorScheme.surfaceContainer
-    radius: height / 2
-    elevation: 2
-
-    signal entered
-
-    signal exited
-
-    function open(): void {
-        surface.state = "opened";
-        entered();
-    }
-
-    function close(): void {
-        surface.state = "closed";
-    }
-
-    property Transition enter: Transition {}
-    property Transition exit: Transition {}
-    state: ""
-
-    Binding {
-        target: surface.enter
-        property: "to"
-        value: "opened"
-    }
-    Binding {
-        target: surface.exit
-        property: "to"
-        value: "closed"
-    }
-
-    Connections {
-        target: surface.exit
-        function onRunningChanged() {
-            if (surface.state == "closed" && !surface.exit.running) {
-                surface.exited();
+            if (enabled) {
+                onStatusChanged();
             }
         }
     }
-
-    transitions: [enter, exit]
 }
-
-// readonly property var __incubator: {
-//     const incubator = contentItem.incubateObject(surface);
-//     incubator.onStatusChanged = function (status) {
-//         if (status == Component.Ready) {
-//             const item = incubator.object;
-//             surface.implicitContentHeight = Qt.binding(() => item.implicitHeight);
-//             surface.implicitContentWidth = Qt.binding(() => item.implicitWidth);
-//             surface.entered();
-//             surface.state = "opened";
-//         }
-//     };
-//     return incubator;
-// }
-// implicitContentHeight: 0
-// implicitContentWidth: 0
-

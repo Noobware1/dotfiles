@@ -1,66 +1,184 @@
+pragma ComponentBehavior: Bound
+
 import Quickshell
 import Quickshell.Wayland
 import QtQuick
 import Material3
 import qs.Features.Bar.Components
-import qs.Shared.Components
-import qs.Features.Bar
+import qs.Features.Bar.Models
 
-PanelWindow {
-    id: bar
-    anchors.top: true
-    anchors.right: true
-    anchors.left: true
-    focusable: true
+LazyLoader {
+    id: root
 
-    // implicitHeight: BarConfig.height
-    readonly property real roundedCornerSize: 0
-    WlrLayershell.namespace: "quickshell:bar"
-    implicitHeight: BarConfig.height + roundedCornerSize
-    color: "transparent"
+    readonly property BarModel __model: BarModel {
+        id: model
+    }
 
-    readonly property real horizontalMargin: 10
-    readonly property real verticalMargin: 5
-    readonly property real heightWithMargin: (bar.implicitHeight - roundedCornerSize) - (bar.verticalMargin * 2)
+    active: model.ready
 
-    Rectangle {
-        height: bar.implicitHeight
+    PanelWindow {
+        id: bar
+
+        property bool isTop: model.direction == BarDirection.Top
+        property bool isBottom: model.direction == BarDirection.Bottom
+        property bool isRight: model.direction == BarDirection.Right
+        property bool isLeft: model.direction == BarDirection.Left
 
         anchors {
-            left: parent.left
-            right: parent.right
-        }
-        color: MaterialTheme.colorScheme.surface
-
-        Workspaces {
-            height: bar.heightWithMargin
-            anchors.left: parent.left
-            anchors.leftMargin: bar.horizontalMargin
-            anchors.verticalCenter: parent.verticalCenter
-            font: BarConfig.font
+            top: isTop || isRight || isLeft
+            right: isRight || isTop || isBottom
+            left: isLeft || isTop || isBottom
+            bottom: isBottom || isRight || isLeft
         }
 
-        Clock {
-            anchors.centerIn: parent
-            height: bar.heightWithMargin
+        focusable: true
+        WlrLayershell.namespace: "quickshell:bar"
+
+        readonly property font font: {
+            switch (model.size) {
+            case BarSize.Large:
+                return MaterialTheme.typography.labelLarge;
+            case BarSize.Medium:
+                return MaterialTheme.typography.labelMedium;
+            case BarSize.Small:
+            default:
+                return MaterialTheme.typography.labelSmall;
+            }
         }
 
-        // Marquee {
-        //     anchors.centerIn: parent
-        //     textString: "hello world"
-        //     font.pixelSize: 14
-        //     verticalAlignment: Text.AlignVCenter
-        //     horizontalAlignment: Text.AlignHCenter
-        //     color: MaterialTheme.colorScheme.onSurface
-        // }
+        readonly property real iconSize: {
+            switch (model.size) {
+            case BarSize.Large:
+                return 34;
+            case BarSize.Medium:
+                return 24;
+            case BarSize.Small:
+            default:
+                return 20;
+            }
+        }
+        readonly property real barSize: {
+            switch (model.size) {
+            case BarSize.Large:
+                return 60;
+            case BarSize.Medium:
+                return 40;
+            case BarSize.Small:
+            default:
+                return 30;
+            }
+        }
 
-        QuickSettings {
-            anchors.right: parent.right
-            anchors.rightMargin: bar.horizontalMargin * 2
-            height: bar.heightWithMargin
-            anchors.verticalCenter: parent.verticalCenter
-            iconSize: BarConfig.iconSize
-            window: bar
+        implicitHeight: isTop || isBottom ? barSize : 0
+        implicitWidth: isLeft || isRight ? barSize : 0
+
+        color: "transparent"
+
+        readonly property alias backgroundColor: background.color
+        readonly property real horizontalMargin: 10
+        readonly property real verticalMargin: 5
+        readonly property real heightWithMargin: bar.implicitHeight - (bar.verticalMargin * 2)
+
+        Rectangle {
+            id: background
+            height: bar.implicitHeight
+
+            anchors.fill: parent
+
+            color: MaterialTheme.colorScheme.surface
+
+            property color contentColor: MaterialTheme.colorScheme.onSurface
+
+            Workspaces {
+                height: bar.heightWithMargin
+                anchors.left: parent.left
+                anchors.leftMargin: bar.horizontalMargin
+                anchors.verticalCenter: parent.verticalCenter
+                font: bar.font
+            }
+
+            Clock {
+                anchors.centerIn: parent
+                height: bar.heightWithMargin
+            }
+
+            QuickSettings {
+                anchors.right: parent.right
+                anchors.rightMargin: bar.horizontalMargin * 2
+                height: bar.heightWithMargin
+                anchors.verticalCenter: parent.verticalCenter
+                iconSize: bar.iconSize
+                window: bar
+            }
+        }
+
+        LazyLoader {
+            active: model.roundedCorners
+            PanelWindow {
+                exclusionMode: ExclusionMode.Ignore
+                WlrLayershell.namespace: "quickshell:roundCorner"
+                WlrLayershell.layer: WlrLayer.Background
+                color: "transparent"
+                visible: true
+
+                anchors {
+                    top: bar.anchors.top
+                    right: bar.anchors.right
+                    left: bar.anchors.left
+                    bottom: bar.anchors.bottom
+                }
+
+                margins {
+                    top: bar.isTop ? bar.implicitHeight : 0
+                    left: bar.isLeft ? bar.implicitWidth : 0
+                    bottom: bar.isBottom ? bar.implicitHeight : 0
+                    right: bar.isRight ? bar.implicitWidth : 0
+                }
+
+                implicitHeight: bar.implicitHeight
+                implicitWidth: bar.implicitWidth
+
+                RoundCorner {
+                    size: bar.barSize
+                    anchors {
+                        top: bar.isLeft || bar.isRight ? parent.top : undefined
+                    }
+
+                    corner: switch (model.direction) {
+                    case BarDirection.Left:
+                        return Qt.TopLeftCorner;
+                    case BarDirection.Right:
+                        return Qt.TopRightCorner;
+                    case BarDirection.Bottom:
+                        return Qt.BottomLeftCorner;
+                    case BarDirection.Top:
+                    default:
+                        return Qt.TopLeftCorner;
+                    }
+                    color: bar.backgroundColor
+                }
+
+                RoundCorner {
+                    anchors {
+                        right: bar.isTop || bar.isBottom ? parent.right : undefined
+                        bottom: bar.isLeft || bar.isRight ? parent.bottom : undefined
+                    }
+                    size: bar.barSize
+                    corner: switch (model.direction) {
+                    case BarDirection.Left:
+                        return Qt.BottomLeftCorner;
+                    case BarDirection.Right:
+                        return Qt.BottomRightCorner;
+                    case BarDirection.Bottom:
+                        return Qt.BottomRightCorner;
+                    case BarDirection.Top:
+                    default:
+                        return Qt.TopRightCorner;
+                    }
+
+                    color: bar.backgroundColor
+                }
+            }
         }
     }
 }

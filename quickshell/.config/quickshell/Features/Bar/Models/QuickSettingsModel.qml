@@ -211,19 +211,4 @@ QtObject {
     Component.onCompleted: {
         __readItemsPrefs();
     }
-
-    readonly property real volume: AudioService.volume
-
-    // property var __a: Timer {
-    //     interval: 500
-    //     running: true
-    //     repeat: true
-    //     onTriggered: {
-    //         console.log(model.volume);
-    //     }
-    // }
-
-    function setVolume(value: real) {
-        AudioService.setVolume(value);
-    }
 }

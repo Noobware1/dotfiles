@@ -11,4 +11,5 @@ Button {
 
     variant: ButtonVariant.Text
     text: Qt.formatDateTime(clock.date, "hh:mm AP - ddd MMM yyyy")
+    colors.contentColor: MaterialTheme.colorScheme.onSurfaceVariant
 }
