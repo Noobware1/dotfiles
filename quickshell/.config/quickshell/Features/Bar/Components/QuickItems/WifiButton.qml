@@ -1,28 +1,33 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
-import QtQuick.Controls as C
+import Quickshell.Networking
+import qs.Services
 import qs.Features.Bar.Components
-import qs.Features.Bar.Views
+import qs.Features.Bar.Models
 
 SplitToggleButton {
     id: button
+    property Network network: NetworkService.connectedNetwork
     icon.name: "wifi"
-    text: "PlaceHolder"
+    text: {
+        if (network) {
+            return network.name;
+        } else {
+            return "Not Connected";
+        }
+    }
+
+    onToggled: {
+        if (network) {
+            // network.disconnect();
+        }
+    }
 
     property real menuHeight
-    property C.StackView navigatingStack
+    property QuickSettingsModel model
 
-    // onClicked: {
-    //     navigatingStack.push(networkListView);
-    // }
-    // Component {
-    //     id: networkListView
-    //     NetworkListView {
-    //         height: button.menuHeight
-    //         anchors.left: parent?.left
-    //         anchors.right: parent?.right
-    //         onBackButtonPressed: button.navigatingStack.pop()
-    //     }
-    // }
+    onClicked: {
+        model.goto("/networks");
+    }
 }

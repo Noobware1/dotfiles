@@ -15,6 +15,8 @@ Dismissable {
     verticalPadding: 16
     elevation: 6
 
+    clipMask: true
+
     readonly property real compactMargins: 16 * 2
     property real contentPadding: 8
 
@@ -26,7 +28,13 @@ Dismissable {
         }
     }
 
-    readonly property QuickSettingsModel model: QuickSettingsModel {}
+    readonly property QuickSettingsModel model: QuickSettingsModel {
+        parent: root
+        menuRadius: root.radius
+        menuWidth: root.implicitWidth
+        menuHeight: 400
+        initialView: mainView
+    }
 
     readonly property real buttonMaxWidth: 180
     readonly property real spacing: 6
@@ -40,20 +48,15 @@ Dismissable {
     implicitHeight: implicitContentHeight + verticalPadding * 2
     implicitWidth: (root.buttonMaxWidth * 2) + root.compactMargins + root.spacing + (root.contentPadding * 2)
 
-    contentItem: C.StackView {
-        id: stack
-        initialItem: mainView
-        implicitHeight: currentItem.implicitHeight
-        implicitWidth: root.implicitWidth
-    }
+    contentItem: model.navigationStack
 
-    // Component {
-    //     id: networkListView
-    //     NetworkListView {
-    //         Layout.preferredHeight: root.buttonHeight * 6 + root.spacing * 5
-    //         Layout.fillWidth: true
-    //     }
-    // }
+    Component {
+        id: networkListView
+        NetworkListView {
+            Layout.preferredHeight: root.buttonHeight * 6 + root.spacing * 5
+            Layout.fillWidth: true
+        }
+    }
 
     Component {
         id: mainView
@@ -87,13 +90,12 @@ Dismissable {
                         id: view
                         anchors.fill: parent
                         maxColumns: 3
-                        model: root.model.itemsModel
+                        model: root.model
                         buttonHeight: root.buttonHeight
                         buttonMaxWidth: root.buttonMaxWidth
                         buttonMinWidth: root.buttonMinWidth
                         spaceBetween: root.spacing
                         contentPadding: root.contentPadding
-                        navigatingStack: stack
                         onSetChecked: function (index: int, toggled: bool) {
                             root.model.setToggled(index, toggled);
                         }
@@ -158,6 +160,9 @@ Dismissable {
         height: 52
         Layout.fillWidth: true
         spacing: root.spacing
+        // radius: 16
+        // elevation: 2
+        // color: MaterialTheme.colorScheme.surfaceContainer
 
         Item {
             Layout.fillWidth: true
@@ -165,7 +170,8 @@ Dismissable {
         IconButton {
             icon.name: "edit"
             onClicked: {
-                root.editMode = !root.editMode;
+                // root.editMode = !root.editMode;
+                stack.push(networkListView);
             }
         }
         IconButton {

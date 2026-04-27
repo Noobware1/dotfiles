@@ -1,26 +1,42 @@
 import QtQuick
+import Quickshell
 import Quickshell.Networking
+import qs.Shared.Components
+import qs.Services
 
-QtObject {
+ViewModel {
     id: root
 
-    readonly property list<WifiNetwork> networks: {
-        const devices = Networking.devices.values;
-
-        let list = [];
-        for (var i = 0; i < devices.length; i++) {
-            const device = devices[i];
-            if (device.type == DeviceType.Wifi) {
-                // device.scannerEnabled = true;
-                list.push(...device.networks.values);
-            }
+    Timer {
+        id: timer
+        running: true
+        interval: 600
+        onTriggered: {
+            NetworkService.scan();
         }
+    }
 
-        return list.sort((a, b) => {
-            if (a.connected !== b.connected) {
-                return b.connected - a.connected;
+    readonly property ScriptModel networks: ScriptModel {
+        values: {
+            const devices = NetworkService.devices.values;
+            let list = [];
+            for (var i = 0; i < devices.length; i++) {
+                const device = devices[i];
+                if (device.type == DeviceType.Wifi) {
+                    list.push(...device.networks.values);
+                }
             }
-            return b.signalStrength - a.signalStrength;
-        });
+
+            return list.sort((a, b) => {
+                if (a.connected !== b.connected) {
+                    return b.connected - a.connected;
+                }
+                return b.signalStrength - a.signalStrength;
+            });
+        }
+    }
+
+    Component.onDestruction: {
+        NetworkService.stopScan();
     }
 }

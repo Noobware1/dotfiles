@@ -4,20 +4,20 @@ import QtQuick.Layouts
 import QtQuick
 import QtQuick.Controls as C
 import qs.Features.Bar.Components
+import qs.Features.Bar.Models
 import qs.Features.Bar.Components.QuickItems
 import Material3
 
 ColumnLayout {
     id: root
     spacing: 0
-    required property var model
     required property real buttonHeight
     required property real buttonMaxWidth
     required property real buttonMinWidth
     required property real spaceBetween
     required property int maxColumns
     required property real contentPadding
-    required property C.StackView navigatingStack
+    required property QuickSettingsModel model
     signal setChecked(int index, bool checked)
 
     C.SwipeView {
@@ -51,8 +51,8 @@ ColumnLayout {
             let lastIndex = -1;
             let data = [];
 
-            for (var i = 0; i < root.model.count; i++) {
-                const button = root.model.get(i);
+            for (var i = 0; i < model.count; i++) {
+                const button = model.get(i);
                 const buttonWidth = button.expanded ? root.buttonMaxWidth : root.buttonMinWidth + root.spaceBetween / 2;
 
                 if (currentSpace + buttonWidth >= view.width) {
@@ -79,7 +79,7 @@ ColumnLayout {
         }
 
         Connections {
-            target: root.model
+            target: root.model.itemsModel
 
             function onLoaded(): void {
                 view.populate();
@@ -106,7 +106,7 @@ ColumnLayout {
                         layout: _layout
                         exclusive: false
                         animate: true
-                        buttons: _layout.children.filter(e => e !== _repeater)
+                        buttons: _layout.children.filter(e => e !== _repeater).sort((a, b) => a.index - b.index)
                     }
                     spacing: root.spaceBetween
                     width: parent.width - (root.contentPadding * 2)
@@ -142,7 +142,7 @@ ColumnLayout {
                     maximumWidth: root.buttonMaxWidth
                     minimumWidth: root.buttonMinWidth
                     menuHeight: root.buttonHeight * 6 + root.spacing * 5
-                    navigatingStack: root.navigatingStack
+                    model: root.model
                 }
             },
             DelegateChoice {

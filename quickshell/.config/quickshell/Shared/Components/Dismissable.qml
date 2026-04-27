@@ -14,6 +14,8 @@ Surface {
     property Transition enter: Transition {}
     property Transition exit: Transition {}
 
+    property bool clipMask: false
+
     implicitContentHeight: contentItem.implicitHeight
     implicitContentWidth: contentItem.implicitWidth
 

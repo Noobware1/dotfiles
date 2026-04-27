@@ -1,19 +1,79 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
+import QtQuick.Controls as C
 import qs.Core
 import qs.Features.Bar.Components
+import qs.Shared.Components
+import qs.Features.Bar.Views
 import qs.Services
+import Material3
 
-QtObject {
+ViewModel {
     id: model
 
+    property Item parent
     property alias itemsModel: _itemsModel
+    property real menuHeight
+    property real menuWidth
+    property real menuRadius
 
-    readonly property list<QtObject> __internals: [
-        ListModel {
-            id: _itemsModel
-            signal loaded
+    property Component overlay: Item {
+        Rectangle {
+            radius: model.menuRadius
+            anchors.horizontalCenter: parent.horizontalCenter
+            width: model.menuWidth
+            // color: Qt.alpha(MaterialTheme.colorScheme.scrim, 0.4)
+            color: Qt.alpha("red", 0.4)
+            Behavior on opacity {
+                NumberAnimation {
+                    duration: 150
+                }
+            }
         }
-    ]
+    }
+
+    ListModel {
+        id: _itemsModel
+        signal loaded
+    }
+
+    readonly property alias navigationStack: __navigationStack
+    property alias initialView: __navigationStack.initialItem
+
+    StackView {
+        id: __navigationStack
+        clip: true
+        implicitHeight: Math.min(currentItem.implicitHeight, model.menuHeight)
+        implicitWidth: Math.max(currentItem.implicitWidth, model.menuWidth)
+        // popExit: Transition {
+        //     XAnimator {
+        //         from: 0
+        //         to: __navigationStack.currentItem.width - model.menuRadius
+        //         duration: 300
+        //         easing.type: Easing.BezierSpline
+        //         easing.bezierCurve: [0.4, 0.0, 0.2, 1.0, 1.0, 1.0]
+        //     }
+        //     PropertyAnimation {
+        //         property: "opacity"
+        //         duration: 300
+        //         easing.type: Easing.BezierSpline
+        //         easing.bezierCurve: [0.4, 0.0, 0.2, 1.0, 1.0, 1.0]
+        //         from: 1
+        //         to: 0
+        //     }
+        // }
+    }
+
+    function goto(path: string): void {
+        switch (path) {
+        case "/networks":
+            __navigationStack.push(networkListView);
+            break;
+        default:
+            break;
+        }
+    }
 
     function saveState(): void {
         let list = [];
@@ -72,133 +132,6 @@ QtObject {
                 expanded: true,
                 checked: false
             },
-
-            /////
-            {
-                type: QuickButton.Wifi,
-                expanded: true,
-                checked: true
-            },
-            {
-                type: QuickButton.Bluetooth,
-                expanded: true,
-                checked: false
-            },
-            {
-                type: QuickButton.Dnd,
-                expanded: false,
-                checked: false
-            },
-            {
-                type: QuickButton.DarkMode,
-                expanded: false,
-                checked: false
-            },
-            {
-                type: QuickButton.PowerMode,
-                expanded: true,
-                checked: false
-            },
-            {
-                type: QuickButton.Wifi,
-                expanded: true,
-                checked: true
-            },
-            {
-                type: QuickButton.Bluetooth,
-                expanded: true,
-                checked: false
-            },
-            {
-                type: QuickButton.Dnd,
-                expanded: false,
-                checked: false
-            },
-            {
-                type: QuickButton.DarkMode,
-                expanded: false,
-                checked: false
-            },
-            {
-                type: QuickButton.PowerMode,
-                expanded: true,
-                checked: false
-            },
-            {
-                type: QuickButton.Wifi,
-                expanded: true,
-                checked: true
-            },
-            {
-                type: QuickButton.Bluetooth,
-                expanded: true,
-                checked: false
-            },
-            {
-                type: QuickButton.Dnd,
-                expanded: false,
-                checked: false
-            },
-            {
-                type: QuickButton.DarkMode,
-                expanded: false,
-                checked: false
-            },
-            {
-                type: QuickButton.PowerMode,
-                expanded: true,
-                checked: false
-            },
-            {
-                type: QuickButton.Wifi,
-                expanded: true,
-                checked: true
-            },
-            {
-                type: QuickButton.Bluetooth,
-                expanded: true,
-                checked: false
-            },
-            {
-                type: QuickButton.Dnd,
-                expanded: false,
-                checked: false
-            },
-            {
-                type: QuickButton.DarkMode,
-                expanded: false,
-                checked: false
-            },
-            {
-                type: QuickButton.PowerMode,
-                expanded: true,
-                checked: false
-            },
-            {
-                type: QuickButton.Wifi,
-                expanded: true,
-                checked: true
-            },
-            {
-                type: QuickButton.Bluetooth,
-                expanded: true,
-                checked: false
-            },
-            {
-                type: QuickButton.Dnd,
-                expanded: false,
-                checked: false
-            },
-            {
-                type: QuickButton.DarkMode,
-                expanded: false,
-                checked: false
-            },
-            {
-                type: QuickButton.PowerMode,
-                expanded: true,
-                checked: false
-            },
         ]);
 
         _itemsModel.clear();
@@ -210,5 +143,15 @@ QtObject {
 
     Component.onCompleted: {
         __readItemsPrefs();
+    }
+
+    Component {
+        id: networkListView
+        NetworkListView {
+            onBackButtonPressed: {
+                __navigationStack.pop();
+            }
+            qsettingsModel: model
+        }
     }
 }

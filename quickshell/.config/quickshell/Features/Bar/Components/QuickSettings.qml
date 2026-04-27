@@ -72,7 +72,6 @@ Button {
 
         QuickSettingsView {
             id: _menu
-
             anchors.horizontalCenter: parent.horizontalCenter
 
             onClosed: {

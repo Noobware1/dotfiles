@@ -119,7 +119,6 @@ LazyLoader {
                 WlrLayershell.namespace: "quickshell:roundCorner"
                 WlrLayershell.layer: WlrLayer.Background
                 color: "transparent"
-                visible: true
 
                 anchors {
                     top: bar.anchors.top
@@ -141,7 +140,8 @@ LazyLoader {
                 RoundCorner {
                     size: bar.barSize
                     anchors {
-                        top: bar.isLeft || bar.isRight ? parent.top : undefined
+                        top: bar.isTop || bar.isLeft || bar.isRight ? parent.top : undefined
+                        bottom: bar.isBottom ? parent.bottom : undefined
                     }
 
                     corner: switch (model.direction) {
@@ -162,6 +162,7 @@ LazyLoader {
                     anchors {
                         right: bar.isTop || bar.isBottom ? parent.right : undefined
                         bottom: bar.isLeft || bar.isRight ? parent.bottom : undefined
+                        top: bar.isTop ? parent.top : undefined
                     }
                     size: bar.barSize
                     corner: switch (model.direction) {
