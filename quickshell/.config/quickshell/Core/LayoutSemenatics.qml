@@ -6,6 +6,9 @@ Singleton {
     id: root
 
     property real compactMargin: 16
+    property real pageVerticalPadding: 12
+    property real pageHorizontalPadding: 16
+    property real popupWindowRadius: 28
 
     property real horizontalPaddingSmall: 8
     property real horizontalPaddingMedium: 12

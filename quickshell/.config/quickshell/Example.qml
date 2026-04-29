@@ -1,9 +1,9 @@
 import QtQuick
-import QtQuick.Controls
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Widgets
 import Quickshell.Networking
+import Material3
 
 FloatingWindow {
     color: contentItem.palette.window

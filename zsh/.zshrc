@@ -75,6 +75,9 @@ function for-file() {
 	find "$p" | fzf --multi | while IFS= read -r file; do "$@" "$file"; done	
 }
 
+function update-mirrors() {
+	sudo reflector --verbose -l 20 -p https -c SG,JP --sort rate --save /etc/pacman.d/mirrorlist
+}
 
 
 fpath=(~/.zsh/completions $fpath)

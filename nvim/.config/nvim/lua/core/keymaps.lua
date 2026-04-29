@@ -1,6 +1,6 @@
 local keymap = vim.keymap
 
-keymap.set({ "n", "i", "s" }, "<leader>h", "<cmd>noh<cr>", { desc = "Close hlsearch" })
+keymap.set({ "n" }, "<leader>h", "<cmd>noh<cr>", { desc = "Close hlsearch" })
 
 keymap.set("n", "<leader>e", "<cmd>Ex<cr>", { desc = "Open explorer" })
 
@@ -21,7 +21,8 @@ keymap.set("n", "<C-j>", "<C-W>j", { desc = "Move cursor to Nth window below cur
 keymap.set("n", "<C-l>", "<C-W>l", { desc = "Move cursor to Nth window left current one" })
 keymap.set("n", "<C-h>", "<C-W>h", { desc = "Move cursor to Nth window right current one" })
 
-keymap.set({ "n", "v" }, "<C-q>", "<cmd>close<cr>", { desc = "Close current window" })
+vim.keymap.set("t", "<C-q>", [[<C-\><C-n><cmd>close<cr>]], { desc = "Exit terminal & close window" })
+vim.keymap.set({ "n", "v" }, "<C-q>", "<cmd>close<cr>", { desc = "Close current window" })
 
 local comment_text = function()
 	if vim.api.nvim_get_mode() == "v" and vim.api.nvim_get_line("'>") > vim.api.nvim_get_line("'<") then
@@ -54,3 +55,27 @@ keymap.set({ "n", "i" }, "<C-w>g", function()
 	-- Insert the lines at the current cursor position
 	vim.api.nvim_put(guard, 'l', true, true) -- 'l' = linewise
 end, { desc = "Insert header guard" })
+
+keymap.set("n", "<leader>xp", function()
+	vim.cmd("belowright vsplit")
+end, { desc = "split verticallly" })
+keymap.set("n", "<leader>cp", function()
+	vim.cmd("belowright split")
+end, { desc = "split below" })
+
+keymap.set("n", "<C-w>h", "<cmd>vertical resize +5<cr>", { desc = "increase window width by 5" })
+keymap.set("n", "<C-w>l", "<cmd>vertical resize -5<cr>", { desc = "decrease window width by 5" })
+keymap.set("n", "<C-w>k", "<cmd>resize +5<cr>", { desc = "increase window height by 5" })
+keymap.set("n", "<C-w>j", "<cmd>resize -5<cr>", { desc = "decrease window height by 5" })
+
+keymap.set("n", "<leader>tt", function()
+	vim.cmd("belowright split")
+	vim.cmd("terminal")
+	vim.cmd("startinsert")
+end, { desc = "open terminal below" })
+
+keymap.set({ "n", "t" }, "<leader>to", function()
+	vim.cmd("resize")
+end, { desc = "expand termial" })
+
+keymap.set("t", "<esc>", "<C-\\><C-n>", { desc = "exit terminal mode" })

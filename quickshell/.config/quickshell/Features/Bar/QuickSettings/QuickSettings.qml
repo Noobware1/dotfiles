@@ -2,13 +2,9 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import Quickshell
-import Quickshell.Hyprland
 import Quickshell.Services.UPower
 import Material3
-import qs.Features.Bar.Components
-import qs.Features.Bar.Views
-import Material3.internals
-import qs.Core
+import qs.Shared.Components
 
 Button {
     id: settings
@@ -41,54 +37,20 @@ Button {
     }
 
     onPressed: {
-        if (popupLoader.active) {
-            (popupLoader.item as QuickMenuPopup).menu.close();
-        } else {
-            popupLoader.loading = true;
-        }
+        popup.toggle();
     }
 
-    LazyLoader {
-        id: popupLoader
-        onActiveChanged: {
-            GlobalState.quickSettingsMenuOpen = active;
-        }
-        QuickMenuPopup {}
-    }
-
-    component QuickMenuPopup: PopupWindow {
+    QsPopup {
         id: popup
         readonly property point offset: settings.parent.mapFromItem(settings, settings.pressX, settings.pressY)
-        anchor.window: settings.window
-        anchor.rect.x: offset.x
-        anchor.rect.y: settings.window.implicitHeight + 2
-        implicitHeight: menu.implicitHeight + 12
-        implicitWidth: menu.implicitWidth + 12
+        window: settings.window
+        x: offset.x
+        y: settings.window.implicitHeight + 2
+        backgroundColor: MaterialTheme.colorScheme.surface
 
-        color: "transparent"
-        visible: true
-
-        property alias menu: _menu
-
-        QuickSettingsView {
-            id: _menu
-            anchors.horizontalCenter: parent.horizontalCenter
-
-            onClosed: {
-                popupLoader.active = false;
-                grab.active = false;
-            }
-        }
-
-        HyprlandFocusGrab {
-            id: grab
-            active: true
-            windows: [popup, settings.window]
-            onActiveChanged: {
-                if (!active) {
-                    _menu.close();
-                }
-            }
+        QuickSettingsMenu {
+            radius: popup.radius
+            backgroundColor: popup.backgroundColor
         }
     }
 

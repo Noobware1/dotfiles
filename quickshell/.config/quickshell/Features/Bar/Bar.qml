@@ -5,6 +5,9 @@ import Quickshell.Wayland
 import QtQuick
 import Material3
 import qs.Features.Bar.Components
+import qs.Features.Bar.QuickSettings
+import qs.Features.Bar.Clock
+import qs.Features.Bar.Workspaces
 import qs.Features.Bar.Models
 
 LazyLoader {

@@ -111,6 +111,7 @@ Surface {
         function onContentItemChanged(): void {
             if (root.explicit)
                 return;
+
             if (root.contentItem instanceof Loader)
                 return;
 

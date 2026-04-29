@@ -18,8 +18,8 @@ vim.api.nvim_create_autocmd(
 vim.api.nvim_create_autocmd(
 	"TextYankPost", {
 		group = group,
-		callback = function(event)
-			vim.highlight.on_yank()
+		callback = function()
+			vim.hl.on_yank()
 		end
 	}
 )
@@ -33,3 +33,14 @@ vim.api.nvim_create_autocmd(
 		end
 	}
 )
+
+vim.api.nvim_create_autocmd("BufWinLeave", {
+	pattern = "term://*",
+	group = group,
+	callback = function(args)
+		local chan = vim.bo[args.buf].channel
+		if chan and chan > 0 then
+			vim.fn.jobstop(chan)
+		end
+	end,
+})
