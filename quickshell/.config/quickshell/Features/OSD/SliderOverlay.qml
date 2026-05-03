@@ -27,7 +27,7 @@ SimpleOverlay {
             implicitWidth: 150
             value: overlay.value
             toolTip: ""
-            stopIndicatorItem: null
+            stopIndicator: null
             onMoved: overlay.moved(value)
         }
         Text {

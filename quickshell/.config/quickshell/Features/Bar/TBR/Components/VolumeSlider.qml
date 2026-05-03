@@ -3,7 +3,7 @@ import qs.Features.Bar.Models
 
 Slider {
     id: slider
-    stopIndicatorItem: null
+    stopIndicator: null
 
     onMoved: {}
 }

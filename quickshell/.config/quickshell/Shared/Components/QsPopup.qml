@@ -119,34 +119,38 @@ LazyLoader {
             }
 
             visible: true
-            y: -_dismissable.implicitHeight
-            x: popupWindow.elevationGap / 2
+            opacity: 0
+            // y: -_dismissable.implicitHeight
+            // x: popupWindow.elevationGap / 2
+            x: _dismissable.implicitWidth
 
             enter: Transition {
-                PropertyAction {
-                    property: "visible"
-                    value: true
+                PropertyAnimation {
+                    property: "opacity"
+                    from: 0
+                    to: 1
+                    easing.bezierCurve: MotionSpecs.expressiveDefaultSpatialBezier
+                    easing.type: Easing.BezierSpline
+                    duration: MotionSpecs.expressiveDefaultSpatialDuration
                 }
                 DefaultAnimation {
-                    from: -_dismissable.implicitHeight
+                    from: _dismissable.implicitWidth
                     to: popupWindow.elevationGap / 2
                 }
             }
 
             exit: Transition {
-                PropertyAction {
-                    target: _dismissable
-                    property: "elevation"
-                    value: 0
-                }
-                PropertyAction {
-                    target: _dismissable
-                    property: "clip"
-                    value: true
+                PropertyAnimation {
+                    property: "opacity"
+                    from: 1
+                    to: 0
+                    easing.bezierCurve: MotionSpecs.expressiveDefaultSpatialBezier
+                    easing.type: Easing.BezierSpline
+                    duration: MotionSpecs.expressiveDefaultSpatialDuration
                 }
                 DefaultAnimation {
                     from: popupWindow.elevationGap / 2
-                    to: -_dismissable.implicitHeight
+                    to: _dismissable.implicitWidth
                 }
             }
         }
@@ -166,7 +170,7 @@ LazyLoader {
     }
 
     component DefaultAnimation: NumberAnimation {
-        property: "y"
+        property: "x"
         easing.bezierCurve: MotionSpecs.expressiveDefaultSpatialBezier
         easing.type: Easing.BezierSpline
         duration: MotionSpecs.expressiveDefaultSpatialDuration

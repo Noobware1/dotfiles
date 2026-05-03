@@ -55,7 +55,7 @@ Singleton {
                     return;
                 }
 
-                // service[`__${type}`] = M3.colorScheme(colorScheme);
+                service[`__${type}`] = M3.colorScheme(colorScheme);
             }
         }
     }

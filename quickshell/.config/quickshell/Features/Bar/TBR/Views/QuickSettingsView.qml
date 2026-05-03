@@ -118,7 +118,7 @@ Dismissable {
         Layout.leftMargin: root.contentPadding
         Layout.fillWidth: true
         trackHeight: SliderDefaults.mediumTrackHeight
-        stopIndicatorItem: null
+        stopIndicator: null
     }
 
     component VolumeSlider: MSlider {

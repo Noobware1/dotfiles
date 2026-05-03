@@ -22,6 +22,8 @@ ShellRoot {
     VolumeOverlay {}
     BrightnessOverlay {}
 
+    // ExampleGrid {}
+
     Component.onCompleted: {
         Preferences.load();
         ThemeService.init();
