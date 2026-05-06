@@ -48,9 +48,20 @@ Button {
         y: settings.window.implicitHeight + 2
         backgroundColor: MaterialTheme.colorScheme.surface
 
+        property bool aboutToClose
+
+        onAboutToHide: {
+            aboutToClose = true;
+        }
+        onAboutToShow: {
+            aboutToClose = false;
+        }
+
         QuickSettingsMenu {
             radius: popup.radius
             backgroundColor: popup.backgroundColor
+            overlay: popup.defaultOverlay
+            aboutToClose: popup.aboutToClose
         }
     }
 

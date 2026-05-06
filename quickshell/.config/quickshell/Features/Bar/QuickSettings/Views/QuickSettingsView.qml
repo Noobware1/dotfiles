@@ -12,9 +12,25 @@ import qs.Core
 Page {
     id: view
     implicitHeight: StackView.view.implicitHeight
+    required property Component overlay
+
+    property bool aboutToClose
 
     QuickSettingsModel {
         id: _model
+    }
+
+    DialogHandler {
+        id: dialogHandler
+        visualParent: view
+        overlay: view.overlay
+        anchors.fill: parent
+    }
+
+    onAboutToCloseChanged: {
+        if (aboutToClose) {
+            dialogHandler.forceCloseDialog();
+        }
     }
 
     header: TopAppBar {
@@ -27,8 +43,7 @@ Page {
             IconButton {
                 icon.name: "edit"
                 onClicked: {
-                    // root.editMode = !root.editMode;
-                    // stack.push(networkListView);
+                    _model.toggleEditMode();
                 }
             },
             IconButton {
@@ -63,7 +78,7 @@ Page {
             }
         }
         VerticalSpacer {
-            space: LayoutSemenatics.pageVerticalPadding
+            value: LayoutSemenatics.pageVerticalPadding
         }
         Surface {
             elevation: 4
@@ -75,7 +90,7 @@ Page {
             Layout.leftMargin: LayoutSemenatics.pageHorizontalPadding
         }
         VerticalSpacer {
-            space: LayoutSemenatics.pageVerticalPadding
+            value: LayoutSemenatics.pageVerticalPadding
         }
     }
 
@@ -111,6 +126,7 @@ Page {
                     roleValue: QuickSettingItem.wifi
                     WifiButton {
                         required property int index
+                        dialogHandler: dialogHandler
                         layoutParent: layout
                     }
                 }

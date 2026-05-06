@@ -18,21 +18,6 @@ ViewModel {
     property real menuWidth
     property real menuRadius
 
-    property Component overlay: Item {
-        Rectangle {
-            radius: model.menuRadius
-            anchors.horizontalCenter: parent.horizontalCenter
-            width: model.menuWidth
-            // color: Qt.alpha(MaterialTheme.colorScheme.scrim, 0.4)
-            color: Qt.alpha("red", 0.4)
-            Behavior on opacity {
-                NumberAnimation {
-                    duration: 150
-                }
-            }
-        }
-    }
-
     ListModel {
         id: _itemsModel
         signal loaded

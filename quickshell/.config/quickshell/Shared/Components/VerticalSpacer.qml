@@ -2,5 +2,5 @@ import QtQuick
 
 Item {
     id: spacer
-    property alias space: spacer.implicitHeight
+    property alias value: spacer.implicitHeight
 }

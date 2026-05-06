@@ -10,6 +10,13 @@ ViewModel {
 
     property alias itemsModel: _itemsModel
 
+    property bool editMode
+
+    function toggleEditMode(): void {
+        saveState();
+        editMode = !editMode;
+    }
+
     ListModel {
         id: _itemsModel
         signal loaded

@@ -14,6 +14,9 @@ LazyLoader {
     property real x
     property real y
 
+    signal aboutToHide
+    signal aboutToShow
+
     function toggle() {
         if (active) {
             close();
@@ -47,17 +50,74 @@ LazyLoader {
     property real bottomPadding: verticalPadding
     property real rightPadding: horizontalPadding
 
+    property real popupHeight
+    property real popupWidth
+
     PopupDelegate {}
+
+    property Component defaultOverlay: Item {
+        Behavior on opacity {
+            NumberAnimation {
+                duration: MotionSpecs.durationShort3
+            }
+        }
+        Rectangle {
+            x: loader.elevationGap / 2
+            y: loader.elevationGap / 2
+            radius: loader.radius
+            height: loader.popupHeight
+            width: loader.popupWidth
+            color: Qt.alpha(MaterialTheme.colorScheme.scrim, 0.4)
+        }
+    }
+    property real elevationGap: 6
+
+    property Transition enter: Transition {
+        PropertyAnimation {
+            property: "opacity"
+            from: 0
+            to: 1
+            easing.bezierCurve: MotionSpecs.expressiveDefaultSpatialBezier
+            easing.type: Easing.BezierSpline
+            duration: MotionSpecs.expressiveDefaultSpatialDuration
+        }
+        DefaultAnimation {
+            from: loader.popupWidth
+            to: loader.elevationGap / 2
+        }
+    }
+
+    property Transition exit: Transition {
+        PropertyAnimation {
+            property: "opacity"
+            from: 1
+            to: 0
+            easing.bezierCurve: MotionSpecs.expressiveDefaultSpatialBezier
+            easing.type: Easing.BezierSpline
+            duration: MotionSpecs.expressiveDefaultSpatialDuration
+        }
+        DefaultAnimation {
+            from: loader.elevationGap / 2
+            to: loader.popupWidth
+        }
+    }
 
     component PopupDelegate: PopupWindow {
         id: popupWindow
-        anchor.window: loader.window
-        property real elevationGap: 6
-        anchor.rect.x: loader.x - elevationGap / 2
-        anchor.rect.y: loader.y - elevationGap / 2
 
-        implicitHeight: _dismissable.implicitHeight + elevationGap
-        implicitWidth: _dismissable.implicitWidth + elevationGap
+        Binding {
+            loader {
+                popupHeight: _dismissable.implicitHeight
+                popupWidth: _dismissable.implicitWidth
+            }
+        }
+
+        anchor.window: loader.window
+        anchor.rect.x: loader.x - loader.elevationGap / 2
+        anchor.rect.y: loader.y - loader.elevationGap / 2
+
+        implicitHeight: _dismissable.implicitHeight + loader.elevationGap
+        implicitWidth: _dismissable.implicitWidth + loader.elevationGap
         color: "transparent"
 
         property alias dismissable: _dismissable
@@ -78,41 +138,13 @@ LazyLoader {
             modal: true
             contentItem: Loader {
                 sourceComponent: loader.content
-                // onLoaded: {
-                //     _dismissable.focusPolicy = Qt.binding(() => item instanceof T.Control ? (item as T.Control).focusPolicy : Qt.NoFocus);
-                // }
             }
-            // contentItem: Item {
-            //     implicitHeight: contentLoader.implicitHeight
-            //     implicitWidth: contentLoader.implicitWidth
-            //
-            //     property Item mask: Item {
-            //         parent: _dismissable.contentItem
-            //         anchors.fill: parent
-            //         layer.enabled: true
-            //         visible: false
-            //         Rectangle {
-            //             radius: _dismissable.radius
-            //             anchors.fill: parent
-            //             color: _dismissable.backgroundColor
-            //         }
-            //     }
-            //
-            //     property Loader contentLoader: Loader {
-            //         parent: _dismissable.contentItem
-            //         layer.enabled: true
-            //         anchors.fill: parent
-            //         layer.effect: MultiEffect {
-            //             maskSource: _dismissable.contentItem.mask
-            //             maskEnabled: true
-            //             maskThresholdMin: 0.5
-            //             maskSpreadAtMin: 1
-            //         }
-            //
-            //         sourceComponent: loader.content
-            //     }
-            // }
-
+            onAboutToHide: {
+                loader.aboutToHide();
+            }
+            onAboutToShow: {
+                loader.aboutToShow();
+            }
             onClosed: {
                 loader.active = false;
                 grab.active = false;
@@ -120,39 +152,9 @@ LazyLoader {
 
             visible: true
             opacity: 0
-            // y: -_dismissable.implicitHeight
-            // x: popupWindow.elevationGap / 2
             x: _dismissable.implicitWidth
-
-            enter: Transition {
-                PropertyAnimation {
-                    property: "opacity"
-                    from: 0
-                    to: 1
-                    easing.bezierCurve: MotionSpecs.expressiveDefaultSpatialBezier
-                    easing.type: Easing.BezierSpline
-                    duration: MotionSpecs.expressiveDefaultSpatialDuration
-                }
-                DefaultAnimation {
-                    from: _dismissable.implicitWidth
-                    to: popupWindow.elevationGap / 2
-                }
-            }
-
-            exit: Transition {
-                PropertyAnimation {
-                    property: "opacity"
-                    from: 1
-                    to: 0
-                    easing.bezierCurve: MotionSpecs.expressiveDefaultSpatialBezier
-                    easing.type: Easing.BezierSpline
-                    duration: MotionSpecs.expressiveDefaultSpatialDuration
-                }
-                DefaultAnimation {
-                    from: popupWindow.elevationGap / 2
-                    to: _dismissable.implicitWidth
-                }
-            }
+            enter: loader.enter
+            exit: loader.exit
         }
 
         visible: true
