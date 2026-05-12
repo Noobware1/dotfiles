@@ -37,31 +37,33 @@ Button {
     }
 
     onPressed: {
-        popup.toggle();
+        popupLoader.toggle();
+        // popup.visible = !popup.visible;
     }
 
-    QsPopup {
-        id: popup
-        readonly property point offset: settings.parent.mapFromItem(settings, settings.pressX, settings.pressY)
-        window: settings.window
-        x: offset.x
-        y: settings.window.implicitHeight + 2
-        backgroundColor: MaterialTheme.colorScheme.surface
+    QsPopupLoader {
+        id: popupLoader
+        QsPopup {
+            id: popup
+            anchor.window: settings.window
+            readonly property point offset: settings.parent.mapFromItem(settings, settings.pressX, settings.pressY)
 
-        property bool aboutToClose
-
-        onAboutToHide: {
-            aboutToClose = true;
-        }
-        onAboutToShow: {
-            aboutToClose = false;
-        }
-
-        QuickSettingsMenu {
-            radius: popup.radius
-            backgroundColor: popup.backgroundColor
-            overlay: popup.defaultOverlay
-            aboutToClose: popup.aboutToClose
+            x: offset.x
+            y: settings.window.implicitHeight + 2
+            // don't know why but if i don't do this swipe acts weird
+            property bool ready: false
+            onAboutToShow: {
+                ready = true;
+            }
+            Loader {
+                active: popup.ready
+                sourceComponent: QuickSettingsMenu {
+                    radius: popup.radius
+                    backgroundColor: popup.backgroundColor
+                }
+            }
+            backgroundColor: MaterialTheme.colorScheme.surface
+            focus: true
         }
     }
 

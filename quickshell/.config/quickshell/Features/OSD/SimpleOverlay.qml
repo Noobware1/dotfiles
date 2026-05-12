@@ -17,10 +17,6 @@ LazyLoader {
     property bool autoHide: true
     property int duration: timer.interval
 
-    // readonly property list<QtObject> __internals: [
-    //
-    // ]
-
     readonly property Timer __timer: Timer {
         id: timer
         interval: MotionSpecs.durationExtraLong4

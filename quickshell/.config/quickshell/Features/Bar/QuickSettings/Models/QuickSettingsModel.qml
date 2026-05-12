@@ -19,7 +19,18 @@ ViewModel {
 
     ListModel {
         id: _itemsModel
-        signal loaded
+        property bool loaded: false
+
+        function isButton(item: var) {
+		return isSlider(item);
+        }
+
+function isSlider(item:var) {
+return item && item.type && (
+    item.type === QuickSettingItem.volume ||
+    item.type === QuickSettingItem.brightness
+) 
+}
     }
 
     function saveState(): void {
@@ -93,7 +104,7 @@ ViewModel {
 
         _itemsModel.append(prefs);
 
-        _itemsModel.loaded();
+        _itemsModel.loaded = true;
     }
 
     Component.onCompleted: {

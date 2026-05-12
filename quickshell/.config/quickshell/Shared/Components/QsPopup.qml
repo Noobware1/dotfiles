@@ -1,172 +1,125 @@
-pragma ComponentBehavior: Bound
-
-import QtQuick
-import QtQuick.Templates as T
-import QtQuick.Effects
-import Material3
 import Quickshell
 import Quickshell.Hyprland
+import Material3
+import QtQuick
 
-LazyLoader {
-    id: loader
+PopupWindow {
+    id: window
 
-    property QtObject window
     property real x
     property real y
 
-    signal aboutToHide
-    signal aboutToShow
+    property alias radius: popup.radius
+    property alias elevation: popup.elevation
+    property alias backgroundColor: popup.backgroundColor
+    property alias padding: popup.padding
+    property alias verticalPadding: popup.verticalPadding
+    property alias horizontalPadding: popup.horizontalPadding
+    property alias leftPadding: popup.leftPadding
+    property alias topPadding: popup.topPadding
+    property alias bottomPadding: popup.bottomPadding
+    property alias rightPadding: popup.rightPadding
+    property alias modal: popup.modal
+    property alias focus: popup.focus
+    property alias enter: popup.enter
+    property alias exit: popup.exit
+    property real elevationPadding: elevation > 0 ? 6 : 0
+    default property alias content: popup.contentItem
 
-    function toggle() {
-        if (active) {
-            close();
-        } else {
-            open();
-        }
-    }
+    signal aboutToShow
+    signal aboutToHide
+    signal opened
+    // already exists :(
+    // signal closed
 
     function close() {
-        const dismissable = (item as PopupDelegate)?.dismissable;
-        if (dismissable) {
-            dismissable.close();
-        }
+        popup.close();
     }
 
     function open() {
-        loading = true;
-        // (item as PopupDelegate).dismissable.open();
+        popup.open();
     }
 
-    default property Component content
-    property real elevation: 4
-    property real radius: 24
-    property color backgroundColor: MaterialTheme.colorScheme.surfaceContainer
+    anchor.rect.x: x - elevationPadding / 2
+    anchor.rect.y: y - elevationPadding / 2
 
-    property real padding: 0
-    property real horizontalPadding: padding
-    property real verticalPadding: padding
-    property real leftPadding: horizontalPadding
-    property real topPadding: verticalPadding
-    property real bottomPadding: verticalPadding
-    property real rightPadding: horizontalPadding
+    implicitHeight: popup.implicitHeight + elevationPadding
+    implicitWidth: popup.implicitWidth + elevationPadding
 
-    property real popupHeight
-    property real popupWidth
+    readonly property real popupHeight: popup.implicitHeight
+    readonly property real popupWidth: popup.implicitWidth
 
-    PopupDelegate {}
+    color: "transparent"
+    visible: true
 
-    property Component defaultOverlay: Item {
-        Behavior on opacity {
-            NumberAnimation {
-                duration: MotionSpecs.durationShort3
+    Popup {
+        id: popup
+        onAboutToHide: {
+            grab.active = false;
+            window.aboutToHide();
+        }
+        onAboutToShow: {
+            window.aboutToShow();
+        }
+        onClosed: {
+            window.closed();
+        }
+        onOpened: {
+            window.opened();
+        }
+        elevation: 4
+        radius: 24
+        backgroundColor: MaterialTheme.colorScheme.surfaceContainer
+
+        padding: 0
+        modal: false
+        focus: false
+        enter: Transition {
+            PropertyAction {
+                property: "x"
+                value: popup.implicitWidth
+            }
+            PropertyAction {
+                property: "opacity"
+                value: 0
+            }
+            PropertyAnimation {
+                property: "opacity"
+                from: 0
+                to: 1
+                easing.bezierCurve: MotionSpecs.expressiveDefaultSpatialBezier
+                easing.type: Easing.BezierSpline
+                duration: MotionSpecs.expressiveDefaultSpatialDuration
+            }
+            DefaultAnimation {
+                from: popup.implicitWidth
+                to: window.elevationPadding / 2
             }
         }
-        Rectangle {
-            x: loader.elevationGap / 2
-            y: loader.elevationGap / 2
-            radius: loader.radius
-            height: loader.popupHeight
-            width: loader.popupWidth
-            color: Qt.alpha(MaterialTheme.colorScheme.scrim, 0.4)
+
+        exit: Transition {
+            PropertyAnimation {
+                property: "opacity"
+                from: 1
+                to: 0
+                easing.bezierCurve: MotionSpecs.expressiveDefaultSpatialBezier
+                easing.type: Easing.BezierSpline
+                duration: MotionSpecs.expressiveDefaultSpatialDuration
+            }
+            DefaultAnimation {
+                from: window.elevationPadding / 2
+                to: popup.implicitWidth
+            }
         }
     }
-    property real elevationGap: 6
 
-    property Transition enter: Transition {
-        PropertyAnimation {
-            property: "opacity"
-            from: 0
-            to: 1
-            easing.bezierCurve: MotionSpecs.expressiveDefaultSpatialBezier
-            easing.type: Easing.BezierSpline
-            duration: MotionSpecs.expressiveDefaultSpatialDuration
-        }
-        DefaultAnimation {
-            from: loader.popupWidth
-            to: loader.elevationGap / 2
-        }
-    }
-
-    property Transition exit: Transition {
-        PropertyAnimation {
-            property: "opacity"
-            from: 1
-            to: 0
-            easing.bezierCurve: MotionSpecs.expressiveDefaultSpatialBezier
-            easing.type: Easing.BezierSpline
-            duration: MotionSpecs.expressiveDefaultSpatialDuration
-        }
-        DefaultAnimation {
-            from: loader.elevationGap / 2
-            to: loader.popupWidth
-        }
-    }
-
-    component PopupDelegate: PopupWindow {
-        id: popupWindow
-
-        Binding {
-            loader {
-                popupHeight: _dismissable.implicitHeight
-                popupWidth: _dismissable.implicitWidth
-            }
-        }
-
-        anchor.window: loader.window
-        anchor.rect.x: loader.x - loader.elevationGap / 2
-        anchor.rect.y: loader.y - loader.elevationGap / 2
-
-        implicitHeight: _dismissable.implicitHeight + loader.elevationGap
-        implicitWidth: _dismissable.implicitWidth + loader.elevationGap
-        color: "transparent"
-
-        property alias dismissable: _dismissable
-
-        Popup {
-            id: _dismissable
-            elevation: loader.elevation
-            radius: loader.radius
-            backgroundColor: loader.backgroundColor
-            padding: loader.padding
-            horizontalPadding: loader.horizontalPadding
-            verticalPadding: loader.verticalPadding
-            topPadding: loader.topPadding
-            leftPadding: loader.leftPadding
-            bottomPadding: loader.bottomPadding
-            rightPadding: loader.rightPadding
-            focus: true
-            modal: true
-            contentItem: Loader {
-                sourceComponent: loader.content
-            }
-            onAboutToHide: {
-                loader.aboutToHide();
-            }
-            onAboutToShow: {
-                loader.aboutToShow();
-            }
-            onClosed: {
-                loader.active = false;
-                grab.active = false;
-            }
-
-            visible: true
-            opacity: 0
-            x: _dismissable.implicitWidth
-            enter: loader.enter
-            exit: loader.exit
-        }
-
-        visible: true
-
-        HyprlandFocusGrab {
-            id: grab
-            active: true
-            windows: [popupWindow, loader.window]
-            onActiveChanged: {
-                if (!active) {
-                    loader.close();
-                }
+    HyprlandFocusGrab {
+        id: grab
+        active: window.focus
+        windows: [window, window.anchor.window]
+        onActiveChanged: {
+            if (!active) {
+                popup.close();
             }
         }
     }

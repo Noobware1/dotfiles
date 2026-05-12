@@ -12,26 +12,27 @@ import qs.Core
 Page {
     id: view
     implicitHeight: StackView.view.implicitHeight
-    required property Component overlay
-
-    property bool aboutToClose
 
     QuickSettingsModel {
         id: _model
     }
 
-    DialogHandler {
-        id: dialogHandler
-        visualParent: view
-        overlay: view.overlay
-        anchors.fill: parent
+    function push(page: Component): void {
+        StackView.view.push(page);
     }
 
-    onAboutToCloseChanged: {
-        if (aboutToClose) {
-            dialogHandler.forceCloseDialog();
-        }
-    }
+    // DialogHandler {
+    //     id: dialogHandler
+    //     visualParent: view
+    //     // overlay: view.overlay
+    //     anchors.fill: parent
+    // }
+
+    // onAboutToCloseChanged: {
+    //     if (aboutToClose) {
+    //         dialogHandler.forceCloseDialog();
+    //     }
+    // }
 
     header: TopAppBar {
         focusPolicy: Qt.TabFocus
@@ -72,13 +73,16 @@ Page {
             id: swipeView
             clip: true
             orientation: Qt.Vertical
+            onContentHeightChanged: console.log("contentHeight:", contentHeight)
+            onHeightChanged: console.log("height:", height)
             Repeater {
+                id: repeater
                 model: 2
                 QuickSettingsItem {}
             }
         }
-        VerticalSpacer {
-            value: LayoutSemenatics.pageVerticalPadding
+        ExplicitSpacer {
+            vertical: LayoutSemenatics.pageVerticalPadding
         }
         Surface {
             elevation: 4
@@ -89,15 +93,20 @@ Page {
             Layout.rightMargin: LayoutSemenatics.pageHorizontalPadding
             Layout.leftMargin: LayoutSemenatics.pageHorizontalPadding
         }
-        VerticalSpacer {
-            value: LayoutSemenatics.pageVerticalPadding
+        ExplicitSpacer {
+            vertical: LayoutSemenatics.pageVerticalPadding
         }
     }
 
     component QuickSettingsItem: Item {
         implicitHeight: layout.height + LayoutSemenatics.pageVerticalPadding * 2
         implicitWidth: layout.width + LayoutSemenatics.pageHorizontalPadding * 2
-
+        Component.onCompleted: {
+            console.log("QuickSettingsItem completed, implicitHeight:", implicitHeight);
+        }
+        onImplicitHeightChanged: {
+            console.log("QuickSettingsItem implicitHeight changed:", implicitHeight);
+        }
         QuickSettingsLayout {
             id: layout
 
@@ -126,7 +135,9 @@ Page {
                     roleValue: QuickSettingItem.wifi
                     WifiButton {
                         required property int index
-                        dialogHandler: dialogHandler
+                        onOpenSettings: {
+                            view.push(internetView);
+                        }
                         layoutParent: layout
                     }
                 }

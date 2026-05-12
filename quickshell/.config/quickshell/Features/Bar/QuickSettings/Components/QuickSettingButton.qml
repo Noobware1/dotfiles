@@ -26,9 +26,7 @@ Button {
 
     contentItem: RowLayout {
         spacing: button.spacing
-        Spacer {
-            Layout.fillWidth: true
-        }
+        Spacer {}
         Icon {
             font.hintingPreference: Font.PreferNoHinting
             name: button.icon.name
@@ -42,8 +40,6 @@ Button {
             text: button.text
             color: enabled ? button.colors.contentColor : button.colors.disabledContentColor
         }
-        Spacer {
-            Layout.fillWidth: true
-        }
+        Spacer {}
     }
 }

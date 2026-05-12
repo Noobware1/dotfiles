@@ -1,6 +1,7 @@
 import QtQuick
+import QtQuick.Layouts
 
 Item {
     id: spacer
-    property alias value: spacer.implicitHeight
+    Layout.fillHeight: true
 }

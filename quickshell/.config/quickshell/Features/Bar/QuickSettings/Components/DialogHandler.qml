@@ -1,5 +1,6 @@
 import QtQuick
 import Material3
+import qs.Shared.Components
 
 QtObject {
     id: root
@@ -12,21 +13,19 @@ QtObject {
     property alias width: root.__loader.width
     readonly property alias parent: root.__loader.parent
 
+    readonly property Component overlay: QsOverlay {}
+
     readonly property Loader __loader: Loader {
         parent: root.visualParent
         onLoaded: {
             if (item instanceof Dialog) {
                 const dialog = (item as Dialog);
-                if (root.overlay) {
-                    dialog.overlay = root.overlay;
-                }
+                dialog.overlay = root.overlay;
                 dialog.open();
             }
         }
         sourceComponent: root.__dialog
     }
-
-    property Component overlay
 
     function openDialog(dialog: Component): void {
         __loader.active = false;

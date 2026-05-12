@@ -60,8 +60,8 @@ Page {
             font: MaterialTheme.typography.titleMedium
             color: MaterialTheme.colorScheme.onSurface
         }
-        VerticalSpacer {
-            value: 16
+        ExplicitSpacer {
+            vertical: 16
         }
         Repeater {
             id: repeater

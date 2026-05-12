@@ -26,6 +26,8 @@ Flow {
 
     Repeater {
         id: repeater
-        onItemAdded: (_, item) => layout.itemCreated(item)
+        onItemAdded: (index, item) => {
+            layout.itemCreated(item);
+        }
     }
 }

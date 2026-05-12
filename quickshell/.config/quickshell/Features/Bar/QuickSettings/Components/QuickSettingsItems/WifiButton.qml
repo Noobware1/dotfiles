@@ -16,7 +16,10 @@ import qs.Shared.Components
 SplitToggleButton {
     id: button
     icon.name: "wifi"
-    required property DialogHandler dialogHandler
+
+    signal openSettings
+    // required property DialogHandler dialogHandler
+    // required property StackView navigationStack
     // property Network network: NetworkService.connectedNetwork
     // text: {
     //     if (network) {
@@ -27,7 +30,7 @@ SplitToggleButton {
     // }
     text: "PlaceHolder"
     onClicked: {
-        dialogHandler.openDialog(dialogDelegate);
+        openSettings();
         // __dialog.open();
         // navigationStack.push(internetView);
     }
@@ -101,8 +104,8 @@ SplitToggleButton {
                         label: "Saved Networks"
                         model: 4
                     }
-                    VerticalSpacer {
-                        value: 18
+                    ExplicitSpacer {
+                        vertical: 18
                     }
                     LabelAndItem {
                         label: "Networks"
@@ -124,8 +127,8 @@ SplitToggleButton {
             font: MaterialTheme.typography.titleMedium
             color: MaterialTheme.colorScheme.onSurface
         }
-        VerticalSpacer {
-            value: 16
+        ExplicitSpacer {
+            vertical: 16
         }
         Repeater {
             id: repeater
