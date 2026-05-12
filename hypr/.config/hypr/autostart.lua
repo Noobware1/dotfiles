@@ -1,0 +1,4 @@
+hl.on("hyprland.start", function()
+	hl.exec_cmd("hyprpaper")
+	hl.exec_cmd("QT_SCALE_FACTOR=1.3 quickshell")
+end)

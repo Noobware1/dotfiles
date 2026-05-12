@@ -123,7 +123,8 @@ return {
 	handlers = {
 		['experimental/serverStatus'] = function(_, result, ctx)
 			if result ~= nil and result.quiescent == true and not M.ran_once then
-				for _, bufnr in ipairs(vim.lsp.get_buffers_by_client_id(ctx.client_id)) do
+				for bufnr, _ in pairs(vim.lsp.get_client_by_id(ctx.client_id).attached_buffers
+				) do
 					vim.lsp.inlay_hint.enable(false, { bufrn = bufnr })
 					vim.lsp.inlay_hint.enable(true, { bufrn = bufnr })
 				end
@@ -133,4 +134,3 @@ return {
 
 	}
 }
-
