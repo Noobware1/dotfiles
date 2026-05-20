@@ -1,50 +1,117 @@
 pragma ComponentBehavior: Bound
 import Material3
 import QtQuick
-import qs.Features.Bar.QuickSettings
 import qs.Features.Bar.QuickSettings.Components
+import qs.Features.Bar.QuickSettings
 import qs.Features.Bar.QuickSettings.Models
-import qs.Features.Bar.QuickSettings.Components.QuickSettingsItems
 import qs.Core
 
 SwipeView {
-    id: swipeView
+    id: view
     clip: true
     orientation: Qt.Vertical
-    onContentHeightChanged: console.log("contentHeight:", contentHeight)
-    onHeightChanged: console.log("height:", height)
+
     required property QuickSettingsModel model
+    readonly property QuickSettingsItemModel itemsModel: view.model.itemsModel
+    readonly property QuickSettingsLayoutMetrics layoutMetrics: QuickSettingsLayoutMetrics {}
+    property int columns: 4
 
-    function populate() {
-        const model = swipeView.model.itemsModel;
-        let currentSpace = 0;
-        let columnCount = 0;
-        let page = 0;
-        let lastIndex = -1;
-        let data = [];
+    default property Component delegate
 
-        for (var i = 0; i < model.count; i++) {
-            const item = model.get(i);
-if(item.isSlider()) {
-	
-}else {
-}
+    ListModel {
+        id: pageModel
+        property bool ready
+
+        function initalize() {
+            const model = view.itemsModel;
+            const M = view.layoutMetrics;
+            let currentSpace = 0;
+            let columnCount = 0;
+            let page = 0;
+            let offset = 0;
+            let data = [];
+            const maxWidth = M.maxLayoutWidth - M.spacing;
+
+            for (var i = 0; i < model.count; i++) {
+                const item = model.get(i);
+                let width;
+                if (model.isSlider(item)) {
+                    width = item.expanded ? M.sliderTrackExpandedWidth : M.sliderTrackCompactWidth;
+                } else {
+                    width = item.expanded ? M.buttonExpandedWidth : M.buttonCompactWidth + M.spacing / 2;
+                }
+
+                if (!data[page]) {
+                    data[page] = {
+                        offset: offset,
+                        model: []
+                    };
+                }
+
+                data[page].model.push(item);
+
+                currentSpace += width;
+
+                if (currentSpace >= maxWidth) {
+                    currentSpace = 0;
+                    columnCount++;
+                }
+
+                if (columnCount == view.columns) {
+                    columnCount = 0;
+                    page++;
+                    offset = i + 1;
+                }
+            }
+
+            pageModel.clear();
+            pageModel.append(data);
+            pageModel.ready = true;
+        }
+    }
+
+    Connections {
+        target: view.itemsModel
+        function onLoaded() {
+            if (!view.itemsModel.ready) {
+                pageModel.initalize();
+            }
+        }
+        Component.onCompleted: {
+            if (view.itemsModel.ready) {
+                pageModel.initalize();
+            }
         }
     }
 
     Repeater {
         id: repeater
-        model: 2
+        model: pageModel
         QuickSettingsItem {}
     }
 
     component QuickSettingsItem: Item {
-        implicitHeight: layout.height + LayoutSemenatics.pageVerticalPadding * 2
-        implicitWidth: layout.width + LayoutSemenatics.pageHorizontalPadding * 2
+        id: qsItemPage
+        // height: view.currentItem.implicitHeight
+        // width: view.currentItem.implicitWidth
+        //        implicitHeight: layout.implicitHeight + LayoutSemenatics.pageVerticalPadding * 2
+        // implicitWidth: layout.implicitWidth + LayoutSemenatics.pageHorizontalPadding * 2
+        // clip: true
+        readonly property real verticalPadding: LayoutSemenatics.pageVerticalPadding
+        readonly property real horizontalPadding: LayoutSemenatics.pageHorizontalPadding
+
+        implicitHeight: index > 0 ? view.contentChildren[0].implicitHeight : layout.implicitHeight + verticalPadding * 2
+        implicitWidth: index > 0 ? view.contentChildren[0].implicitWidth : layout.implicitWidth + horizontalPadding * 2
+
+        // required property var modelData
+        required property int offset
+        required property ListModel model
+        required property int index
 
         QuickSettingsLayout {
             id: layout
-
+            metrics: view.layoutMetrics
+            height: Math.min(implicitHeight, metrics.maxLayoutHeight)
             ButtonGroup {
                 id: buttonGroup
                 layoutParent: layout
@@ -52,77 +119,18 @@ if(item.isSlider()) {
                 animate: true
                 buttons: layout.children.filter(e => e instanceof Button).sort((a, b) => a.index - b.index)
             }
-
-            anchors.centerIn: parent
-            model: swipeView.model
-            height: Math.min(implicitHeight, contentHeight)
-            width: contentWidth
+            y: qsItemPage.verticalPadding
+            x: qsItemPage.horizontalPadding
+            model: qsItemPage.model
             onItemCreated: item => {
-                if (item instanceof Button) {
-                    const button = item as Button;
-                    button.expandedChanged.connect(() => swipeView.model.setExpanded(button.index, button.expanded));
-                    button.toggled.connect(() => swipeView.model.setToggled(button.index, button.checked));
+                if (view.itemsModel.isButton(item)) {
+                    const button = item as QuickSettingButton;
+                    button.toggled.connect(() => view.itemsModel.setChecked(button.index + qsItemPage.offset, button.checked));
+                } else {
+                    // const slider = item as QuickSettingSlider;
                 }
             }
-            delegate: DelegateChooser {
-                role: "type"
-                DelegateChoice {
-                    roleValue: QuickSettingItem.wifi
-                    WifiButton {
-                        required property int index
-                        onOpenSettings: {}
-                        layoutParent: layout
-                    }
-                }
-                DelegateChoice {
-                    roleValue: QuickSettingItem.bluetooth
-                    BluetoothButton {
-                        required property int index
-                        layoutParent: layout
-                    }
-                }
-                DelegateChoice {
-                    roleValue: QuickSettingItem.darkMode
-                    DarkModeButton {
-                        required property int index
-                        layoutParent: layout
-                    }
-                }
-                DelegateChoice {
-                    roleValue: QuickSettingItem.doNotDisturb
-                    DoNotDisturbButton {
-                        required property int index
-                        layoutParent: layout
-                    }
-                }
-                DelegateChoice {
-                    roleValue: QuickSettingItem.powerMode
-                    PowerModeButton {
-                        required property int index
-                        layoutParent: layout
-                    }
-                }
-                DelegateChoice {
-                    roleValue: QuickSettingItem.volume
-                    VolumeSlider {
-                        required property int index
-                        layoutParent: layout
-                    }
-                }
-                DelegateChoice {
-                    roleValue: QuickSettingItem.brightness
-                    BrightnessSlider {
-                        required property int index
-                        layoutParent: layout
-                    }
-                }
-            }
+            delegate: view.delegate
         }
     }
-
-    // ROUTES
-    // Component {
-    //     id: internetView
-    //     InternetView {}
-    // }
 }

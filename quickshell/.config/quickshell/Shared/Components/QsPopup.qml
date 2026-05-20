@@ -74,43 +74,6 @@ PopupWindow {
         padding: 0
         modal: false
         focus: false
-        enter: Transition {
-            PropertyAction {
-                property: "x"
-                value: popup.implicitWidth
-            }
-            PropertyAction {
-                property: "opacity"
-                value: 0
-            }
-            PropertyAnimation {
-                property: "opacity"
-                from: 0
-                to: 1
-                easing.bezierCurve: MotionSpecs.expressiveDefaultSpatialBezier
-                easing.type: Easing.BezierSpline
-                duration: MotionSpecs.expressiveDefaultSpatialDuration
-            }
-            DefaultAnimation {
-                from: popup.implicitWidth
-                to: window.elevationPadding / 2
-            }
-        }
-
-        exit: Transition {
-            PropertyAnimation {
-                property: "opacity"
-                from: 1
-                to: 0
-                easing.bezierCurve: MotionSpecs.expressiveDefaultSpatialBezier
-                easing.type: Easing.BezierSpline
-                duration: MotionSpecs.expressiveDefaultSpatialDuration
-            }
-            DefaultAnimation {
-                from: window.elevationPadding / 2
-                to: popup.implicitWidth
-            }
-        }
     }
 
     HyprlandFocusGrab {
@@ -122,12 +85,5 @@ PopupWindow {
                 popup.close();
             }
         }
-    }
-
-    component DefaultAnimation: NumberAnimation {
-        property: "x"
-        easing.bezierCurve: MotionSpecs.expressiveDefaultSpatialBezier
-        easing.type: Easing.BezierSpline
-        duration: MotionSpecs.expressiveDefaultSpatialDuration
     }
 }

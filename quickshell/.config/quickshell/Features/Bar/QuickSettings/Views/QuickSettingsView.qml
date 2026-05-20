@@ -21,19 +21,6 @@ Page {
         StackView.view.push(page);
     }
 
-    // DialogHandler {
-    //     id: dialogHandler
-    //     visualParent: view
-    //     // overlay: view.overlay
-    //     anchors.fill: parent
-    // }
-
-    // onAboutToCloseChanged: {
-    //     if (aboutToClose) {
-    //         dialogHandler.forceCloseDialog();
-    //     }
-    // }
-
     header: TopAppBar {
         focusPolicy: Qt.TabFocus
         topLeftRadius: view.radius
@@ -44,7 +31,8 @@ Page {
             IconButton {
                 icon.name: "edit"
                 onClicked: {
-                    _model.toggleEditMode();
+                    view.push(editPage);
+                    // _model.toggleEditMode();
                 }
             },
             IconButton {
@@ -69,16 +57,43 @@ Page {
             Layout.alignment: Qt.AlignHCenter
             visible: count > 1
         }
-        SwipeView {
+        QuickSettingsSwipeView {
             id: swipeView
-            clip: true
-            orientation: Qt.Vertical
-            onContentHeightChanged: console.log("contentHeight:", contentHeight)
-            onHeightChanged: console.log("height:", height)
-            Repeater {
-                id: repeater
-                model: 2
-                QuickSettingsItem {}
+            model: _model
+            DelegateChooser {
+                role: "type"
+                DelegateChoice {
+                    roleValue: QuickSettingItem.wifi
+                    WifiButton {
+                        onOpenSettings: {
+                            view.push(internetSettingsPage);
+                        }
+                    }
+                }
+                DelegateChoice {
+                    roleValue: QuickSettingItem.bluetooth
+                    BluetoothButton {}
+                }
+                DelegateChoice {
+                    roleValue: QuickSettingItem.darkMode
+                    DarkModeButton {}
+                }
+                DelegateChoice {
+                    roleValue: QuickSettingItem.doNotDisturb
+                    DoNotDisturbButton {}
+                }
+                DelegateChoice {
+                    roleValue: QuickSettingItem.powerMode
+                    PowerModeButton {}
+                }
+                DelegateChoice {
+                    roleValue: QuickSettingItem.volume
+                    VolumeSlider {}
+                }
+                DelegateChoice {
+                    roleValue: QuickSettingItem.brightness
+                    BrightnessSlider {}
+                }
             }
         }
         ExplicitSpacer {
@@ -98,92 +113,15 @@ Page {
         }
     }
 
-    component QuickSettingsItem: Item {
-        implicitHeight: layout.height + LayoutSemenatics.pageVerticalPadding * 2
-        implicitWidth: layout.width + LayoutSemenatics.pageHorizontalPadding * 2
-        Component.onCompleted: {
-            console.log("QuickSettingsItem completed, implicitHeight:", implicitHeight);
-        }
-        onImplicitHeightChanged: {
-            console.log("QuickSettingsItem implicitHeight changed:", implicitHeight);
-        }
-        QuickSettingsLayout {
-            id: layout
+    Component {
+        id: internetSettingsPage
+        InternetView {}
+    }
 
-            ButtonGroup {
-                id: buttonGroup
-                layoutParent: layout
-                exclusive: false
-                animate: true
-                buttons: layout.children.filter(e => e instanceof Button).sort((a, b) => a.index - b.index)
-            }
-
-            anchors.centerIn: parent
-            model: _model.itemsModel
-            height: Math.min(implicitHeight, contentHeight)
-            width: contentWidth
-            onItemCreated: item => {
-                if (item instanceof Button) {
-                    const button = item as Button;
-                    button.expandedChanged.connect(() => _model.setExpanded(button.index, button.expanded));
-                    button.toggled.connect(() => _model.setToggled(button.index, button.checked));
-                }
-            }
-            delegate: DelegateChooser {
-                role: "type"
-                DelegateChoice {
-                    roleValue: QuickSettingItem.wifi
-                    WifiButton {
-                        required property int index
-                        onOpenSettings: {
-                            view.push(internetView);
-                        }
-                        layoutParent: layout
-                    }
-                }
-                DelegateChoice {
-                    roleValue: QuickSettingItem.bluetooth
-                    BluetoothButton {
-                        required property int index
-                        layoutParent: layout
-                    }
-                }
-                DelegateChoice {
-                    roleValue: QuickSettingItem.darkMode
-                    DarkModeButton {
-                        required property int index
-                        layoutParent: layout
-                    }
-                }
-                DelegateChoice {
-                    roleValue: QuickSettingItem.doNotDisturb
-                    DoNotDisturbButton {
-                        required property int index
-                        layoutParent: layout
-                    }
-                }
-                DelegateChoice {
-                    roleValue: QuickSettingItem.powerMode
-                    PowerModeButton {
-                        required property int index
-                        layoutParent: layout
-                    }
-                }
-                DelegateChoice {
-                    roleValue: QuickSettingItem.volume
-                    VolumeSlider {
-                        required property int index
-                        layoutParent: layout
-                    }
-                }
-                DelegateChoice {
-                    roleValue: QuickSettingItem.brightness
-                    BrightnessSlider {
-                        required property int index
-                        layoutParent: layout
-                    }
-                }
-            }
+    Component {
+        id: editPage
+        QuickSettingsEditView {
+            itemsModel: _model.itemsModel
         }
     }
 }

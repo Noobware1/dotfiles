@@ -1,24 +1,37 @@
 import QtQuick
 import QtQuick.Layouts
 import Material3
-import qs.Shared.Components
 import qs.Features.Bar.QuickSettings.Components
 
 QuickSettingButton {
     id: button
+    enabled: !editable
 
     radius: ButtonDefaults.radiusFor(containerHeight)
 
     colors: {
         const cs = MaterialTheme.colorScheme;
+        let colors = checkable ? ButtonDefaults.filledButtonColors(cs, checked) : ButtonDefaults.filledButtonColors(cs);
+        if (expanded) {
+            colors.backgroundColor = cs.surfaceContainer;
+            colors.contentColor = cs.onSurfaceVariant;
+        }
+        return colors;
+        // return M3.buttonColors({
+        //     backgroundColor: cs.surfaceContainer,
+        //     contentColor: cs.onSurfaceVariant,
+        //     disabledBackgroundColor: editable ? cs.surfaceContainer : Qt.alpha(cs.surface, 0.1),
+        //     disabledContentColor: editable ? cs.onSurfaceVariant : Qt.alpha(cs.onSurface, 0.38)
+        // }
 
-        return M3.buttonColors({
-            backgroundColor: cs.surfaceContainer,
-            contentColor: cs.onSurfaceVariant,
-            disabledBackgroundColor: Qt.alpha(cs.surface, 0.1),
-            disabledContentColor: Qt.alpha(cs.onSurface, 0.38)
-        });
+        // return M3.buttonColors({
+        //     backgroundColor: cs.surfaceContainer,
+        //     contentColor: cs.onSurfaceVariant,
+        //     disabledBackgroundColor: editable ? cs.surfaceContainer : Qt.alpha(cs.surface, 0.1),
+        //     disabledContentColor: editable ? cs.onSurfaceVariant : Qt.alpha(cs.onSurface, 0.38)
+        // });
     }
+
     verticalPadding: 6
     horizontalPadding: 6
     spacing: 4
@@ -31,8 +44,9 @@ QuickSettingButton {
             containerHeight: button.availableHeight
             colors: {
                 const cs = MaterialTheme.colorScheme;
-                const colors = IconButtonDefaults.colorsFor(cs, variant, checked);
+                let colors = IconButtonDefaults.colorsFor(cs, variant, checked);
                 colors.backgroundColor = checked ? cs.primary : cs.surfaceContainerHigh;
+
                 return colors;
             }
             checkable: true
@@ -49,7 +63,7 @@ QuickSettingButton {
         Label {
             text: button.text
             font: button.font
-            color: button.colors.contentColor
+            color: enabled ? button.colors.contentColor : button.colors.disabledContentColor
             visible: button.expanded
         }
     }

@@ -4,8 +4,11 @@ import QtQuick.Controls as C
 import QtQuick.Layouts
 import Material3
 import qs.Features.Bar.QuickSettings
+import qs.Features.Bar.QuickSettings.Views
+import qs.Features.Bar.QuickSettings.Models
 import qs.Shared.Components
 import qs.Core
+import Quickshell.Networking
 
 Page {
     id: view
@@ -14,7 +17,24 @@ Page {
     implicitWidth: menu?.implicitWidth ?? 0
     radius: menu?.radius ?? 0
     backgroundColor: menu?.backgroundColor ?? "transparent"
-    // property alias QuickSettingsModel qsModel
+    readonly property InternetViewModel model: InternetViewModel {}
+
+onOpenMenu: function(network, offset) {
+menu.x = offset.x
+menu.y = offset.y
+menu.open()
+}
+
+	Menu {
+
+		id:menu		
+MenuItem {
+text: "Forget"
+}
+MenuItem {
+text: "More"
+}
+	}
 
     header: TopAppBar {
         focusPolicy: Qt.TabFocus
@@ -40,11 +60,12 @@ Page {
 
             LabelAndItem {
                 label: "Saved Networks"
-                model: 4
+                model: view.model.savedNetworks
+                visible: model.values.length > 0
             }
             LabelAndItem {
                 label: "Networks"
-                model: 20
+                model: view.model.availableNetworks
             }
         }
     }
@@ -69,26 +90,32 @@ Page {
             delegate: MListItem {
                 Layout.fillWidth: true
                 lastIndex: repeater.count - 1
+onClickedOptions: {
+	view.openMenu(modelData, Qt.point(pressX,pressY))
+}
+                onClicked: {
+                    view.menu.push(networkAuthPage, {
+                        network: modelData
+                    });
+                }
             }
         }
     }
+
+signal openMenu(Network network, point offset)
 
     component MListItem: ListItem {
         id: item
         required property int index
         required property int lastIndex
-        property var modelData: {
-            return {
-                name: "SITI FIBER 5G",
-                connected: false
-            };
-        }
-        subtitleText: (modelData?.connected ?? false) ? "connected" : ""
+        required property WifiNetwork modelData
+        readonly property bool connected: (modelData?.connected ?? false)
+        subtitleText: connected ? "connected" : ""
         elevation: 0
         colors: {
             const cs = MaterialTheme.colorScheme;
             const colors = ListDefaults.colors(cs);
-            colors.backgroundColor = cs.surfaceContainerHigh;
+            colors.backgroundColor = connected ? cs.secondaryContainer : cs.surfaceContainerHigh;
             return colors;
         }
         topLeftRadius: index == 0 ? height / 2 : radius
@@ -102,33 +129,38 @@ Page {
             color: item.colors.secondaryContentColor
         }
         text: modelData?.name ?? "[No Name]"
-        trailing: IconButton {
-            id: button
+signal clickedOptions
+
+        trailing: Loader {
             anchors.centerIn: parent
-            icon.name: "more_vert"
+            sourceComponent: (item.modelData?.known ?? false) ? moreButton : lockedIcon
+            Component {
+                id: lockedIcon
+                Item {
+                    implicitHeight: IconButtonDefaults.smallHeight
+                    implicitWidth: IconButtonDefaults.smallUniformPadding * 2 + icon.implicitWidth
+                    Icon {
+                        id: icon
+                        anchors.centerIn: parent
+                        name: "lock"
+                        size: ListDefaults.iconSize
+                    }
+                }
+            }
+            Component {
+                id: moreButton
+                IconButton {
+                    icon.name: "more_vert"
+			onClicked: item.clickedOptions()
+                }
+            }
         }
     }
-    // contentItem: PaddedListView {
-    //     model: 30
-    //     horizontalPadding: LayoutSemenatics.pageHorizontalPadding
-    //     verticalPadding: LayoutSemenatics.pageVerticalPadding
-    //
-    //     delegate: PaddedListItem {
-    //         id: item
-    //         property var modelData: {
-    //             return {
-    //                 name: "SITI FIBER 5G",
-    //                 connected: false
-    //             };
-    //         }
-    //         // required property WifiNetwork modelData
-    //         // anchors.horizontalCenter: parent?.horizontalCenter
-    //         elevation: 4
-    //         subtitleText: (modelData?.connected ?? false) ? "connected" : ""
-    //         onClicked: {
-    //             // popup.open();
-    //         }
 
-    //     }
-    // }
+    Component {
+        id: networkAuthPage
+        NetworkAuthView {
+            network: view.selectedNetwork
+        }
+    }
 }
