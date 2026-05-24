@@ -27,6 +27,7 @@ ShellRoot {
     Component.onCompleted: {
         Preferences.load();
         ThemeService.init();
+        NetworkService.init();
     }
 
     // Example {}

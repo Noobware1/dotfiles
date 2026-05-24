@@ -8,20 +8,21 @@ Item {
             duration: MotionSpecs.durationShort3
         }
     }
+
     Rectangle {
         id: rect
         color: Qt.alpha(MaterialTheme.colorScheme.scrim, 0.4)
 
+        readonly property var window: QsWindow.window
+
         Binding {
-            id: popupBinding
             when: QsWindow.window instanceof QsPopup
-            readonly property QsPopup popup: when ? QsWindow.window as QsPopup : null
             rect {
-                x: popupBinding.popup.elevationPadding / 2
-                y: popupBinding.popup.elevationPadding / 2
-                radius: popupBinding.popup.radius
-                height: popupBinding.popup.implicitHeight - popupBinding.popup.elevationPadding
-                width: popupBinding.popup.implicitWidth - popupBinding.popup.elevationPadding
+                x: rect.window.animatedX
+                y: rect.window.animatedY
+                radius: rect.window.radius
+                height: rect.window.popupHeight
+                width: rect.window.popupWidth
             }
         }
     }

@@ -1,6 +1,7 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
+import Material3
 
 ListView {
     id: view
@@ -24,4 +25,6 @@ ListView {
     }
     footerPositioning: ListView.OverlayFooter
     headerPositioning: ListView.OverlayHeader
+
+    Menu {}
 }

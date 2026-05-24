@@ -10,23 +10,21 @@ ViewModel {
 
     readonly property list<WifiDevice> wifiDevices: [...NetworkService.devices.values].filter(e => e.type === DeviceType.Wifi)
 
+    property list<WifiNetwork> wifiNetworks: model.wifiDevices.reduce(function (acc, device) {
+        return acc.concat(device.networks.values);
+    }, [])
+
     property ScriptModel savedNetworks: ScriptModel {
-        values: {
-            const networks = model.wifiDevices.reduce((acc, device) => acc.concat([...device.networks.values].filter(e => e.known)), []);
-            return networks.sort((a, b) => {
-                if (a.connected !== b.connected) {
-                    return b.connected - a.connected;
-                }
-                return b.signalStrength - a.signalStrength;
-            });
-        }
+        values: [...model.wifiNetworks].filter((e => e.known)).sort((a, b) => {
+            if (a.connected !== b.connected) {
+                return b.connected - a.connected;
+            }
+            return b.signalStrength - a.signalStrength;
+        })
     }
 
     property ScriptModel availableNetworks: ScriptModel {
-        values: {
-            const networks = model.wifiDevices.reduce((acc, device) => acc.concat([...device.networks.values].filter(e => !e.known)), []);
-            return networks.sort((a, b) => b.signalStrength - a.signalStrength);
-        }
+        values: [...model.wifiNetworks].filter((e => !e.known)).sort((a, b) => b.signalStrength - a.signalStrength)
     }
 
     Component.onCompleted: {
@@ -35,5 +33,9 @@ ViewModel {
                 device.scannerEnabled = true;
             });
         });
+    }
+
+    function connect(network: WifiNetwork, passphrase = "") {
+        NetworkService.connect(network, passphrase);
     }
 }

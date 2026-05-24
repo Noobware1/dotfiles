@@ -18,11 +18,6 @@ Page {
     property string password: ""
 
     function connect(): void {
-        if (network.security === WifiSecurityType.WpaPsk && network.security === WifiSecurityType.Wpa2Psk && network.security === WifiSecurityType.Sae) {
-            network.connectWithPsk(password);
-        } else {
-            network.connect();
-        }
     }
 
     Connections {

@@ -8,6 +8,8 @@ PopupWindow {
 
     property real x
     property real y
+    readonly property real animatedX: popup.x
+    readonly property real animatedY: popup.y
 
     property alias radius: popup.radius
     property alias elevation: popup.elevation

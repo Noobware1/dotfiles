@@ -54,13 +54,22 @@ function cool() {
 }
 
 function shift-mode() {
+	local available_modes
+	available_modes=$(cat /sys/devices/platform/msi-ec/available_shift_modes)
+
 	if [[ "$1" == "list" ]]; then
-		cat /sys/devices/platform/msi-ec/available_shift_modes
+		echo "$available_modes"
 	elif [[ "$1" == "" ]]; then
 		cat /sys/devices/platform/msi-ec/shift_mode
 	else
-		echo $1 | sudo tee /sys/devices/platform/msi-ec/shift_mode
-		echo ""
+		if echo "$available_modes" | grep -qw "$1"; then
+			echo "$1" | sudo tee /sys/devices/platform/msi-ec/shift_mode
+			echo ""
+		else
+			echo "Invalid mode: '$1'" >&2
+			echo "Available modes: $available_modes" >&2
+			return 1
+		fi
 	fi
 }
 
