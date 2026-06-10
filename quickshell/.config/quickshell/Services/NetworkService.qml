@@ -32,13 +32,43 @@ Qs.Singleton {
         Network.wifiEnabled = true;
     }
 
+    function requiresPassword(network: Network): bool {
+        return network && network instanceof WifiNetwork && [WifiSecurityType.WpaPsk, WifiSecurityType.Wpa2Psk, WifiSecurityType.Sae].includes(network.security);
+    }
+
     function connect(network: Network, passphrase = "") {
+        console.log("CALLED");
         if (!network) {
             return;
         }
 
-        if (network.type === DeviceType.Wifi && [WifiSecurityType.WpaPsk, WifiSecurityType.Wpa2Psk, WifiSecurityType.Sae].includes(network.security)) {
-            (network as WifiNetwork).connectWithPsk(passphrase);
+        const devices = this.devices.values;
+        let found = false;
+
+        for (let i = 0; i < devices.length; ++i) {
+            const device = devices[i];
+
+            if (device.type !== DeviceType.Wifi) {
+                continue;
+            }
+
+            const networks = device.networks.values;
+            if (networks.includes(network)) {
+                found = true;
+                break;
+            }
+        }
+
+        if (!found) {
+            return;
+        }
+
+        if (requiresPassword(network)) {
+            if (network.known && !passphrase) {
+                network.connect();
+            } else {
+                (network as WifiNetwork).connectWithPsk(passphrase);
+            }
         } else {
             network.connect();
         }

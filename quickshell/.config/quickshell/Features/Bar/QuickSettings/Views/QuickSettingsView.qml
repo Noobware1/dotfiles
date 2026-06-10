@@ -11,28 +11,43 @@ import qs.Core
 
 Page {
     id: view
-    implicitHeight: StackView.view.implicitHeight
+    implicitHeight: StackView.view?.implicitHeight ?? 0
 
     QuickSettingsModel {
-        id: _model
+        id: viewModel
     }
 
     function push(page: Component): void {
         StackView.view.push(page);
     }
-
     header: TopAppBar {
         focusPolicy: Qt.TabFocus
         topLeftRadius: view.radius
         topRightRadius: view.radius
-        headlineText: "Placeholder"
-        subtitleText: "supporting text"
+        headlineText: viewModel.userName
+        horizontalPadding: LayoutSemenatics.pageHorizontalPadding
+        subtitleText: `Up ${viewModel.uptime}`
+        spacing: 12
+        topPadding: 6
+        leading: Rectangle {
+            implicitHeight: 50
+            implicitWidth: 50
+            radius: 50 / 2
+            anchors.verticalCenter: parent.verticalCenter
+            color: MaterialTheme.colorScheme.primary
+            Icon {
+                anchors.centerIn: parent
+                name: "person"
+                color: MaterialTheme.colorScheme.onPrimary
+                size: 32
+            }
+        }
         actions: [
             IconButton {
                 icon.name: "edit"
                 onClicked: {
                     view.push(editPage);
-                    // _model.toggleEditMode();
+                    // viewModel.toggleEditMode();
                 }
             },
             IconButton {
@@ -59,7 +74,7 @@ Page {
         }
         QuickSettingsSwipeView {
             id: swipeView
-            model: _model
+            model: viewModel
             DelegateChooser {
                 role: "type"
                 DelegateChoice {
@@ -72,7 +87,11 @@ Page {
                 }
                 DelegateChoice {
                     roleValue: QuickSettingItem.bluetooth
-                    BluetoothButton {}
+                    BluetoothButton {
+                        onOpenSettings: {
+                            view.push(bluetoothSettingsPage);
+                        }
+                    }
                 }
                 DelegateChoice {
                     roleValue: QuickSettingItem.darkMode
@@ -119,9 +138,14 @@ Page {
     }
 
     Component {
+        id: bluetoothSettingsPage
+        BluetoothView {}
+    }
+
+    Component {
         id: editPage
         QuickSettingsEditView {
-            itemsModel: _model.itemsModel
+            itemsModel: viewModel.itemsModel
         }
     }
 }

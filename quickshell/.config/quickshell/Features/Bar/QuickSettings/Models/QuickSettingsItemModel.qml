@@ -136,7 +136,7 @@ ListModel {
             },
 
             ///
-            ,]);
+            , ,]);
 
         model.clear();
 

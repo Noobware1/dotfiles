@@ -9,6 +9,7 @@ import qs.Features.Bar.QuickSettings
 import qs.Features.Bar.Clock
 import qs.Features.Bar.Workspaces
 import qs.Features.Bar.Models
+import qs.Core
 
 LazyLoader {
     id: root
@@ -22,10 +23,18 @@ LazyLoader {
     PanelWindow {
         id: bar
 
+        Binding {
+            target: WindowManager
+            property: "barWindow"
+            value: bar
+        }
+
         property bool isTop: model.direction == BarDirection.Top
         property bool isBottom: model.direction == BarDirection.Bottom
         property bool isRight: model.direction == BarDirection.Right
         property bool isLeft: model.direction == BarDirection.Left
+
+        readonly property int orientation: bar.isLeft || bar.isRight ? Qt.Vertical : Qt.Horizontal
 
         anchors {
             top: isTop || isRight || isLeft
@@ -37,35 +46,58 @@ LazyLoader {
         focusable: true
         WlrLayershell.namespace: "quickshell:bar"
 
-        readonly property font font: {
+        readonly property font effectiveFont: {
             switch (model.size) {
             case BarSize.Large:
-                return MaterialTheme.typography.labelLarge;
+                return MaterialTheme.typography.titleMedium;
             case BarSize.Medium:
-                return MaterialTheme.typography.labelMedium;
+                return MaterialTheme.typography.labelLarge;
             case BarSize.Small:
             default:
-                return MaterialTheme.typography.labelSmall;
+                return MaterialTheme.typography.labelMedium;
             }
         }
 
-        readonly property real iconSize: {
+        readonly property font effectiveEmphasisedFont: {
             switch (model.size) {
             case BarSize.Large:
-                return 34;
+                return MaterialTheme.emphasizedTypography.titleLarge;
             case BarSize.Medium:
-                return 24;
+            case BarSize.Small:
+            default:
+                return MaterialTheme.emphasizedTypography.labelLarge;
+            }
+        }
+
+        readonly property real effectiveIconSize: {
+            switch (model.size) {
+            case BarSize.Large:
+                return LayoutDefaults.iconSizeMedium;
+            case BarSize.Medium:
+            case BarSize.Small:
+            default:
+                return LayoutDefaults.iconSizeSmall;
+            }
+        }
+
+        readonly property real effectiveButtonSize: {
+            switch (model.size) {
+            case BarSize.Large:
+                return 32;
+            case BarSize.Medium:
+                return 28;
             case BarSize.Small:
             default:
                 return 20;
             }
         }
+
         readonly property real barSize: {
             switch (model.size) {
             case BarSize.Large:
                 return 60;
             case BarSize.Medium:
-                return 40;
+                return 45;
             case BarSize.Small:
             default:
                 return 30;
@@ -82,9 +114,24 @@ LazyLoader {
         readonly property real verticalMargin: 5
         readonly property real heightWithMargin: bar.implicitHeight - (bar.verticalMargin * 2)
 
+        readonly property real spacing: 12
+
+        readonly property real effectivePadding: {
+            switch (model.size) {
+            case BarSize.Large:
+                return 8;
+            case BarSize.Medium:
+                return 6;
+            case BarSize.Small:
+            default:
+                return 4;
+            }
+        }
+
+        readonly property real availableLength: (bar.orientation == Qt.Horizontal ? bar.implicitHeight : bar.implicitWidth) - bar.effectivePadding * 2
+
         Rectangle {
             id: background
-            height: bar.implicitHeight
 
             anchors.fill: parent
 
@@ -93,30 +140,41 @@ LazyLoader {
             property color contentColor: MaterialTheme.colorScheme.onSurface
 
             Workspaces {
-                height: bar.heightWithMargin
-                anchors.left: parent.left
-                anchors.leftMargin: bar.horizontalMargin
-                anchors.verticalCenter: parent.verticalCenter
-                font: bar.font
+                font: bar.effectiveFont
+                orientation: bar.orientation
+                x: horizontal ? bar.spacing : (parent.width - width) / 2
+                y: horizontal ? (parent.height - height) / 2 : bar.spacing
+                buttonSize: bar.effectiveButtonSize
+                iconSize: bar.effectiveIconSize
+                maximumLength: (horizontal ? clock.x : clock.y) - bar.spacing * 2
+                availableLength: bar.availableLength
             }
 
             Clock {
-                anchors.centerIn: parent
-                height: bar.heightWithMargin
+                id: clock
+                orientation: bar.orientation
+                font: bar.effectiveEmphasisedFont
+                x: (parent.width - width) / 2
+                y: (parent.height - height) / 2
+                availableLength: bar.availableLength
+                iconSize: bar.effectiveIconSize
             }
 
             QuickSettings {
-                anchors.right: parent.right
-                anchors.rightMargin: bar.horizontalMargin * 2
-                height: bar.heightWithMargin
-                anchors.verticalCenter: parent.verticalCenter
-                iconSize: bar.iconSize
-                window: bar
+                iconSize: bar.effectiveIconSize
+                barDirection: model.direction
+                orientation: bar.orientation
+                verticalMargin: bar.verticalMargin
+                horizontalMargin: bar.horizontalMargin
+                x: horizontal ? parent.width - width - horizontalMargin : (parent.width - width) / 2
+                y: horizontal ? (parent.height - height) / 2 : parent.height - height - horizontalMargin
+                buttonHeight: bar.effectiveButtonSize
             }
         }
 
         LazyLoader {
             active: model.roundedCorners
+
             PanelWindow {
                 exclusionMode: ExclusionMode.Ignore
                 WlrLayershell.namespace: "quickshell:roundCorner"

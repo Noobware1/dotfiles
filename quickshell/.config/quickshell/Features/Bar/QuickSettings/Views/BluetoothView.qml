@@ -4,50 +4,17 @@ import QtQuick
 import QtQuick.Controls as C
 import QtQuick.Layouts
 import Material3
+import qs.Features.Bar.QuickSettings
 import qs.Features.Bar.QuickSettings.Models
 import qs.Features.Bar.QuickSettings.Components
 import qs.Shared.Components
 import qs.Core
-import Quickshell.Networking
+import Quickshell.Bluetooth
 
 ChildPage {
     id: view
-    readonly property InternetViewModel model: InternetViewModel {}
 
-    property WifiPasswordDialog dialog
-
-    function openDialog(network: WifiNetwork): void {
-        view.dialog = passwordDialog.createObject(view, {
-            network: network
-        });
-    }
-
-    Component {
-        id: passwordDialog
-        WifiPasswordDialog {
-            y: LayoutSemenatics.pageVerticalPadding + height
-            x: (view.implicitWidth - width) / 2
-            width: view.width - LayoutSemenatics.pageHorizontalPadding * 2
-            onConnect: {
-                view.model.connect(network, passphrase);
-            }
-            onConnectionFailedChanged: {
-                if (connectionFailed) {
-                    view.model.forget(network);
-                }
-            }
-            onClosed: {
-                view.dialog = null;
-                this.destroy();
-            }
-            onAboutToShow: {
-                // view.freezeConnectedState = true;
-            }
-            Component.onCompleted: {
-                open();
-            }
-        }
-    }
+    readonly property BluetoothViewModel model: BluetoothViewModel {}
 
     header: ColumnLayout {
         spacing: 0
@@ -56,7 +23,7 @@ ChildPage {
             focusPolicy: Qt.TabFocus
             topLeftRadius: view.radius
             topRightRadius: view.radius
-            headlineText: "Internet"
+            headlineText: "Bluetooth"
             horizontalPadding: LayoutSemenatics.pageHorizontalPadding
             leading: BackButton {
                 onClicked: {
@@ -82,13 +49,13 @@ ChildPage {
             spacing: 18
 
             SegmentedList {
-                label: "Saved Networks"
-                model: view.model.savedNetworks
+                label: "Paired Devices"
+                model: view.model.pairedDevices
                 visible: model.values.length > 0
             }
             SegmentedList {
-                label: "Networks"
-                model: view.model.availableNetworks
+                label: "Available Devices"
+                model: view.model.availableDevices
             }
         }
     }
@@ -97,41 +64,22 @@ ChildPage {
         id: list
         Layout.fillWidth: true
 
-        delegate: NetworkDelegate {
+        delegate: BluetoothDeviceDelegate {
             lastIndex: list.lastIndex
         }
     }
 
-    component NetworkDelegate: ListItem {
+    component BluetoothDeviceDelegate: ListItem {
         id: item
         required property int index
         required property int lastIndex
-        required property WifiNetwork modelData
-        readonly property bool connected: (modelData?.connected ?? false)
-        property bool known: modelData?.known ?? false
-        property bool askPasswordOnFail
-        property bool newConnection: false
-        Connections {
-            target: item.modelData
-            enabled: item.askPasswordOnFail
-            function onConnectionFailed(): void {
-                if (view.dialog) {
-                    console.log("This condition should not be true");
-                    return;
-                }
-
-                item.askPasswordOnFail = false;
-                if (item.newConnection) {
-                    view.model.forget(item.modelData);
-                }
-                view.openDialog();
-            }
-        }
+        required property BluetoothDevice modelData
+        readonly property bool connected: modelData?.connected ?? false
         subtitleText: {
             if (connected) {
                 return "Connected";
             }
-            if (modelData && modelData.state == ConnectionState.Connecting) {
+            if (modelData && (modelData.pairing || modelData.state == BluetoothDeviceState.Connecting)) {
                 return "Connecting";
             }
             return null;
@@ -155,20 +103,11 @@ ChildPage {
         }
         text: modelData?.name ?? "[No Name]"
         onClicked: {
-            if (connected) {
-                return;
-            }
-            if (known) {
-                askPasswordOnFail = view.model.requiresPassword(modelData);
-                // tries to connect without password first
-                view.model.connect(modelData);
-            } else {
-                view.openDialog(modelData);
-            }
+            view.model.connect(modelData);
         }
 
         trailing: Loader {
-            sourceComponent: item.modelData?.known ?? false ? iconButton : iconContainer
+            sourceComponent: item.modelData?.paired ?? false ? iconButton : iconContainer
 
             Component {
                 id: iconContainer
@@ -189,9 +128,7 @@ ChildPage {
                     icon.name: "more_vert"
 
                     iconSize: ListDefaults.iconSize
-                    onClicked: {
-                        view.model.forget(item.modelData);
-                    }
+                    onClicked: {}
                 }
             }
         }

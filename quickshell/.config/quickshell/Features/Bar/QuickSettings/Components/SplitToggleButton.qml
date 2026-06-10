@@ -1,4 +1,5 @@
 import QtQuick
+import qs.Shared.Components
 import QtQuick.Layouts
 import Material3
 import qs.Features.Bar.QuickSettings.Components
@@ -37,9 +38,9 @@ QuickSettingButton {
     spacing: 4
 
     contentItem: RowLayout {
+        property real availableWidth: button.implicitWidth - children[0].implicitWidth + spacing
         spacing: button.spacing
         IconButton {
-            id: iconToggle
             variant: ButtonVariant.Filled
             containerHeight: button.availableHeight
             colors: {
@@ -50,21 +51,25 @@ QuickSettingButton {
                 return colors;
             }
             checkable: true
-            checked: button.isChecked
+            checked: button.checked
             onToggled: {
                 button.checked = checked;
                 button.toggled();
             }
             Layout.fillHeight: true
             icon: button.icon
-            radius: iconToggle.checked ? ButtonDefaults.radiusFor(iconToggle.containerHeight) : height / 2
+            radius: checked ? ButtonDefaults.radiusFor(containerHeight) : height / 2
             horizontalPadding: IconButtonDefaults.widePaddingFor(containerHeight)
         }
-        Label {
+        Marquee {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
             text: button.text
             font: button.font
             color: enabled ? button.colors.contentColor : button.colors.disabledContentColor
             visible: button.expanded
+            backgroundColor: enabled ? button.colors.backgroundColor : button.colors.disabledBackgroundColor
+            addGradient: !button.hovered
         }
     }
 }

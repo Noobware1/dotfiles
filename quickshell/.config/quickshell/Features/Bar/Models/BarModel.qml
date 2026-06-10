@@ -5,13 +5,13 @@ import qs.Features.Bar
 QtObject {
     id: model
 
-    property int direction: BarDirection.Top
+    property int direction: BarDirection.Left
     property bool roundedCorners: true
-    property int size: BarSize.Small
+    property int size: BarSize.Medium
 
     property bool ready
 
-    function __readItemsPrefs() {
+    function __readPrefs() {
         const prefs = Preferences.getObject("bar_prefs", {
             direction: model.direction,
             roundedCorners: model.roundedCorners,
@@ -24,7 +24,23 @@ QtObject {
         model.ready = true;
     }
 
+    function __writePrefs() {
+        const direction = model.direction;
+        const roundedCorners = model.roundedCorners;
+        const size = model.size;
+
+        // Preferences.setObject("bar_prefs", {
+        //     direction: model.direction,
+        //     roundedCorners: model.roundedCorners,
+        //     size: model.size
+        // });
+    }
+
     Component.onCompleted: {
-        __readItemsPrefs();
+        __readPrefs();
+    }
+
+    Component.onDestruction: {
+        __writePrefs();
     }
 }

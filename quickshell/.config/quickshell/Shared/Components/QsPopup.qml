@@ -11,6 +11,9 @@ PopupWindow {
     readonly property real animatedX: popup.x
     readonly property real animatedY: popup.y
 
+    readonly property real effectiveX: elevationPadding / 2
+    readonly property real effectiveY: elevationPadding / 2
+
     property alias radius: popup.radius
     property alias elevation: popup.elevation
     property alias backgroundColor: popup.backgroundColor
@@ -21,6 +24,10 @@ PopupWindow {
     property alias topPadding: popup.topPadding
     property alias bottomPadding: popup.bottomPadding
     property alias rightPadding: popup.rightPadding
+    property alias leftInset: popup.leftInset
+    property alias topInset: popup.topInset
+    property alias bottomInset: popup.bottomInset
+    property alias rightInset: popup.rightInset
     property alias modal: popup.modal
     property alias focus: popup.focus
     property alias enter: popup.enter
@@ -42,9 +49,12 @@ PopupWindow {
         popup.open();
     }
 
-    anchor.rect.x: x - elevationPadding / 2
-    anchor.rect.y: y - elevationPadding / 2
+    // anchor.rect.x: x - elevationPadding / 2
+    // anchor.rect.y: y - elevationPadding / 2
+    anchor.rect.x: x
+    anchor.rect.y: y
 
+    // implicitHeight: popup.implicitHeight + elevationPadding
     implicitHeight: popup.implicitHeight + elevationPadding
     implicitWidth: popup.implicitWidth + elevationPadding
 
@@ -56,6 +66,10 @@ PopupWindow {
 
     Popup {
         id: popup
+        height: parent.height - window.elevationPadding
+        width: parent.width - window.elevationPadding
+        x: window.effectiveX
+        y: window.effectiveY
         onAboutToHide: {
             grab.active = false;
             window.aboutToHide();

@@ -27,6 +27,23 @@ ViewModel {
         values: [...model.wifiNetworks].filter((e => !e.known)).sort((a, b) => b.signalStrength - a.signalStrength)
     }
 
+    function autoConnect(network: WifiNetwork) {
+        NetworkService.connect(network);
+    }
+
+    function connect(network: WifiNetwork, passphrase = "") {
+        network.newConnection = !network.known;
+        NetworkService.connect(network, passphrase);
+    }
+
+    function requiresPassword(network: WifiNetwork): bool {
+        return NetworkService.requiresPassword(network);
+    }
+
+    function forget(network: WifiNetwork) {
+        network.forget();
+    }
+
     Component.onCompleted: {
         Qt.callLater(function () {
             model.wifiDevices.forEach(function (device) {
@@ -35,7 +52,9 @@ ViewModel {
         });
     }
 
-    function connect(network: WifiNetwork, passphrase = "") {
-        NetworkService.connect(network, passphrase);
+    Component.onDestruction: {
+        model.wifiDevices.forEach(function (device) {
+            device.scannerEnabled = false;
+        });
     }
 }

@@ -10,24 +10,20 @@ import qs.Features.Bar.QuickSettings.Models
 import qs.Shared.Components
 import qs.Core
 
-Page {
+ChildPage {
     id: view
-    property QuickSettingsMenu menu: StackView.view as QuickSettingsMenu
     readonly property QuickSettingsLayoutMetrics layoutMetrics: QuickSettingsLayoutMetrics {}
 
     required property QuickSettingsItemModel itemsModel
 
-    implicitHeight: menu?.implicitHeight ?? 0
-    implicitWidth: menu?.implicitWidth ?? 0
-    radius: menu?.radius ?? 0
-    backgroundColor: menu?.backgroundColor ?? "transparent"
     header: TopAppBar {
         focusPolicy: Qt.TabFocus
         topLeftRadius: view.radius
         topRightRadius: view.radius
         headlineText: "Edit Tiles"
+        horizontalPadding: LayoutSemenatics.pageHorizontalPadding
         // colors.backgroundColor: "red"
-        leadingItem: BackButton {
+        leading: BackButton {
             onClicked: {
                 view.StackView.view.pop();
             }
