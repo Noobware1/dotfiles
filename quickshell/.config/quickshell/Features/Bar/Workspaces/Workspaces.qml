@@ -7,11 +7,13 @@ import Material3
 import qs.Shared.Components
 import qs.Core
 import Quickshell.Hyprland
+import qs.Features.Bar
 
 Loader {
     id: root
     required property font font
     required property real maximumLength
+    required property int barSize
     required property real availableLength
     required property real iconSize
     required property int orientation
@@ -49,7 +51,17 @@ Loader {
         layoutParent: root.item as Item
     }
 
-    property real buttonSize: Math.min(root.availableLength, 32)
+    property real buttonSize: {
+        switch (root.barSize) {
+        case BarSize.Large:
+            return 32;
+        case BarSize.Medium:
+            return 24;
+        case BarSize.Small:
+        default:
+            return 20;
+        }
+    }
 
     Component {
         id: rowLayout

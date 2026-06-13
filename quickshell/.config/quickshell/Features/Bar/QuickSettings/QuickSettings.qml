@@ -89,6 +89,7 @@ Button {
     QuickSettingsMenu {
         id: menu
         barDirection: settings.barDirection
+        orientation: settings.orientation
     }
 
     component MIcon: Icon {

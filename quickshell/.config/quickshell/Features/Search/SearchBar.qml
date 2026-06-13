@@ -1,29 +1,29 @@
 pragma ComponentBehavior: Bound
+
 import QtQuick
+import QtQuick.Templates as T
+import QtQuick.Layouts
 import qs.Core
-import QtQuick.Controls as C
 import Material3
 import Quickshell
-import Quickshell.Io
 import Quickshell.Hyprland
 import Quickshell.Wayland
+import qs.Features.Search.Models
 
 LazyLoader {
     id: root
 
-    readonly property list<QtObject> data: [
-        IpcHandler {
-            target: "search"
+    readonly property SearchBarViewModel model: SearchBarViewModel {
+        id: viewModel
 
-            function toggle() {
-                if (root.active) {
-                    root.active = false;
-                } else {
-                    root.loading = true;
-                }
+        onSearchToggled: {
+            if (root.active) {
+                root.active = false;
+            } else {
+                root.loading = true;
             }
         }
-    ]
+    }
 
     PanelWindow {
         id: window
@@ -34,8 +34,8 @@ LazyLoader {
 
         anchors.top: true
         margins.top: Math.round(Screen.height / 3)
-        implicitHeight: search.implicitHeight + 12
-        implicitWidth: search.implicitWidth
+        implicitHeight: 400
+        implicitWidth: control.implicitWidth
         color: "transparent"
 
         Binding {
@@ -45,11 +45,37 @@ LazyLoader {
         }
 
         SearchField {
-            id: search
-            anchors.centerIn: parent
+            id: control
+            anchors.top: parent.top
+            anchors.topMargin: 6
+            anchors.horizontalCenter: parent.horizontalCenter
+            // anchors.centerIn: parent
             focus: true
             implicitWidth: 600
             font: TextFieldDefaults.font(MaterialTheme.typography)
+            suggestionModel: DesktopEntries.applications
+            textRole: "name"
+            delegate: MenuItem {
+                id: item
+                width: ListView.view.width ?? implicitWidth
+                required property DesktopEntry modelData
+                text: modelData.name ?? ""
+                visible: text.length > 0
+                icon.name: modelData?.icon ?? ""
+                // contentItem: RowLayout {
+                contentItem: Label {
+                    verticalAlignment: Text.AlignVCenter
+                    text: item.text
+                }
+                // }
+
+            }
+
+            Binding {
+                target: viewModel
+                property: "searchQuery"
+                value: control.text
+            }
         }
 
         HyprlandFocusGrab {

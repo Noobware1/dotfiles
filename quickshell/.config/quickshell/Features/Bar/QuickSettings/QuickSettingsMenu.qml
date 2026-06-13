@@ -8,27 +8,52 @@ import qs.Shared.Components
 import qs.Core
 import qs.Features.Bar
 import Quickshell
+import Quickshell.Hyprland
 
 QsPopupLoader {
     id: root
+
+    required property int orientation
+    readonly property bool horizontal: orientation == Qt.Horizontal
     required property int barDirection
     readonly property bool isLeft: barDirection == BarDirection.Left
-    readonly property bool isRigth: barDirection == BarDirection.Right
+    readonly property bool isRight: barDirection == BarDirection.Right
+    readonly property bool isTop: barDirection == BarDirection.Top
     readonly property PanelWindow window: WindowManager.barWindow
+    readonly property real margins: 10
+
+    readonly property Binding __binding: Binding {
+        target: GlobalState
+        property: "quickSettingsMenuOpen"
+        value: root.active
+    }
+
     QsPopup {
         id: popup
         radius: 28
         anchor.window: root.window
         x: {
-            if (root.isLeft) {
-                return root.window.width + root.window.width / 3.5;
-            } else {
-                return width;
+            switch (root.barDirection) {
+            case BarDirection.Left:
+                return root.window.width + root.margins;
+            case BarDirection.Right:
+            case BarDirection.Bottom:
+            case BarDirection.Top:
+            default:
+                return root.window.width - width - root.margins;
             }
         }
-        // color: "red"
-        // y: root.window.width / 2
-        y: 8
+        y: {
+            switch (root.barDirection) {
+            case BarDirection.Left:
+            case BarDirection.Right:
+            case BarDirection.Bottom:
+                return root.margins;
+            case BarDirection.Top:
+            default:
+                return root.window.height + root.margins;
+            }
+        }
 
         // don't know why but if i don't do this swipe acts weird
         property bool ready: false
@@ -41,7 +66,7 @@ QsPopupLoader {
                 id: stackView
                 readonly property real radius: popup.radius
                 readonly property color backgroundColor: popup.backgroundColor
-                implicitHeight: Screen.height - 24
+                implicitHeight: Screen.height - root.margins * 2 - (root.horizontal ? root.window.height : 0)
                 focusPolicy: Qt.TabFocus
 
                 initialItem: QuickSettingsView {

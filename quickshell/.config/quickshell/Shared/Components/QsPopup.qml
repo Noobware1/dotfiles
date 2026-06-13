@@ -32,7 +32,8 @@ PopupWindow {
     property alias focus: popup.focus
     property alias enter: popup.enter
     property alias exit: popup.exit
-    property real elevationPadding: elevation > 0 ? 6 : 0
+    // property real elevationPadding: elevation > 0 ? 6 : 0
+    property real elevationPadding: 0
     default property alias content: popup.contentItem
 
     signal aboutToShow

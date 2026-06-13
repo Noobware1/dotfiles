@@ -5,9 +5,9 @@ import qs.Features.Bar
 QtObject {
     id: model
 
-    property int direction: BarDirection.Left
+    property int direction: BarDirection.Top
     property bool roundedCorners: true
-    property int size: BarSize.Medium
+    property int size: BarSize.Small
 
     property bool ready
 

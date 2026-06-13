@@ -35,44 +35,55 @@ Button {
 
     horizontalPadding: horizontal ? ButtonDefaults.horizontalPaddingFor(containerHeight) : 0
     verticalPadding: horizontal ? 0 : ButtonDefaults.horizontalPaddingFor(containerHeight)
-    contentItem: Loader {
-        sourceComponent: button.horizontal ? horizontalContent : verticalContent
+    contentItem: Label {
+        font: button.font
+        text: button.text
+        verticalAlignment: Text.AlignVCenter
+        horizontalAlignment: Text.AlignHCenter
     }
+    // contentItem: Loader {
+    //     sourceComponent: button.horizontal ? horizontalContent : verticalContent
+    // }
 
-    Component {
-        id: horizontalContent
-        RowLayout {
-            spacing: button.spacing
-            Icon {
-                name: button.icon.name
-                size: button.iconSize
-                color: button.colors.contentColor
-                Layout.alignment: Qt.AlignVCenter
-            }
-            Label {
-                font: button.font
-                text: button.text
-                Layout.alignment: Qt.AlignVCenter
-            }
-        }
-    }
+    // Component {
+    //     id: horizontalContent
+    //     RowLayout {
+    //
+    //         spacing: button.spacing
+    //         Icon {
+    //             name: button.icon.name
+    //             size: button.iconSize
+    //             color: button.colors.contentColor
+    //             Layout.alignment: Qt.AlignVCenter
+    //             readonly property real centerY: (button.availableHeight - Math.min(implicitHeight, label.implicitHeight)) / 2
+    //             Layout.bottomMargin: centerY - Math.floor(centerY)
+    //         }
+    //         Label {
+    //             id: label
+    //             font: button.font
+    //             text: button.text
+    //             Layout.alignment: Qt.AlignVCenter
+    //             verticalAlignment: Text.AlignVCenter
+    //         }
+    //     }
+    // }
 
-    Component {
-        id: verticalContent
-        ColumnLayout {
-            spacing: button.spacing
-            Icon {
-                name: button.icon.name
-                size: button.iconSize
-                color: button.colors.contentColor
-                Layout.alignment: Qt.AlignHCenter
-            }
-            Label {
-                Layout.alignment: Qt.AlignHCenter
-                font: button.font
-                text: button.text
-                horizontalAlignment: Text.AlignHCenter
-            }
-        }
-    }
+    // Component {
+    //     id: verticalContent
+    //     ColumnLayout {
+    //         spacing: button.spacing
+    //         Icon {
+    //             name: button.icon.name
+    //             size: button.iconSize
+    //             color: button.colors.contentColor
+    //             Layout.alignment: Qt.AlignHCenter
+    //         }
+    //         Label {
+    //             Layout.alignment: Qt.AlignHCenter
+    //             font: button.font
+    //             text: button.text
+    //             horizontalAlignment: Text.AlignHCenter
+    //         }
+    //     }
+    // }
 }

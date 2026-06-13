@@ -9,10 +9,11 @@ Button {
     required property int index
     required property bool expanded
     required property bool isChecked
-    property QuickSettingsLayout layoutParent: parent instanceof QuickSettingsLayout ? parent as QuickSettingsLayout : null
+    readonly property QuickSettingsLayout layoutParent: parent instanceof QuickSettingsLayout ? parent as QuickSettingsLayout : null
 
     property bool editable: false
 
+    iconSize: expanded ? ButtonDefaults.iconSizeFor(layoutParent.metrics.tileHeight) : IconButtonDefaults.iconSizeFor(layoutParent.metrics.tileHeight)
     // colors: {
     //     const cs = MaterialTheme.colorScheme;
     //     let backgroundColor = cs.surfaceContainer;

@@ -85,7 +85,7 @@ LazyLoader {
             case BarSize.Large:
                 return 32;
             case BarSize.Medium:
-                return 28;
+                return 24;
             case BarSize.Small:
             default:
                 return 20;
@@ -128,7 +128,7 @@ LazyLoader {
             }
         }
 
-        readonly property real availableLength: (bar.orientation == Qt.Horizontal ? bar.implicitHeight : bar.implicitWidth) - bar.effectivePadding * 2
+        readonly property real availableLength: barSize - bar.effectivePadding * 2
 
         Rectangle {
             id: background
@@ -142,9 +142,9 @@ LazyLoader {
             Workspaces {
                 font: bar.effectiveFont
                 orientation: bar.orientation
+                barSize: model.size
                 x: horizontal ? bar.spacing : (parent.width - width) / 2
                 y: horizontal ? (parent.height - height) / 2 : bar.spacing
-                buttonSize: bar.effectiveButtonSize
                 iconSize: bar.effectiveIconSize
                 maximumLength: (horizontal ? clock.x : clock.y) - bar.spacing * 2
                 availableLength: bar.availableLength
