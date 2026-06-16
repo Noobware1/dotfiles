@@ -1,6 +1,7 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
+import qs.Shared.Components
 import QtQuick.Templates as T
 import QtQuick.Layouts
 import qs.Core
@@ -17,6 +18,7 @@ LazyLoader {
         id: viewModel
 
         onSearchToggled: {
+            // root.toggle();
             if (root.active) {
                 root.active = false;
             } else {
@@ -35,8 +37,29 @@ LazyLoader {
         anchors.top: true
         margins.top: Math.round(Screen.height / 3)
         implicitHeight: 400
-        implicitWidth: control.implicitWidth
+        implicitWidth: searchField.implicitWidth
         color: "transparent"
+
+        signal closed
+
+        function open() {
+            searchField.open();
+        }
+
+        function close() {
+            searchField.close();
+        }
+
+        // Menu {}
+
+        mask: Region {
+            intersection: Intersection.Xor
+            item: Item {
+                anchors.bottom: parent?.bottom ?? undefined
+                width: window.width
+                height: window.height - searchField.height - 6 - searchField.popup.height
+            }
+        }
 
         Binding {
             target: WindowManager
@@ -45,36 +68,94 @@ LazyLoader {
         }
 
         SearchField {
-            id: control
+            id: searchField
             anchors.top: parent.top
             anchors.topMargin: 6
             anchors.horizontalCenter: parent.horizontalCenter
-            // anchors.centerIn: parent
             focus: true
             implicitWidth: 600
             font: TextFieldDefaults.font(MaterialTheme.typography)
-            suggestionModel: DesktopEntries.applications
+            suggestionModel: viewModel.suggestionModel
             textRole: "name"
+
+            function open() {
+                state = "open";
+            }
+
+            function close() {
+                state = "close";
+            }
+
+            // scale: 0.4
+            // opacity: 0
+            // states: [
+            //     State {
+            //         name: "open"
+            //         PropertyChanges {
+            //             searchField {
+            //                 scale: 1.0
+            //                 opacity: 1.0
+            //             }
+            //         }
+            //     },
+            //     State {
+            //         name: "close"
+            //         PropertyChanges {
+            //             searchField {
+            //                 scale: 0.4
+            //                 opacity: 0
+            //             }
+            //         }
+            //     }
+            // ]
+            //
+            // transitions: Transition {
+            //     onRunningChanged: {
+            //         if (!running && searchField.state == "close") {
+            //             window.closed();
+            //         }
+            //     }
+            //     NumberAnimation {
+            //         property: "scale"
+            //         easing.type: Easing.OutQuint
+            //         duration: 220
+            //     }
+            //     NumberAnimation {
+            //         property: "opacity"
+            //         easing.type: Easing.OutCubic
+            //         duration: 150
+            //     }
+            // }
+
             delegate: MenuItem {
                 id: item
                 width: ListView.view.width ?? implicitWidth
                 required property DesktopEntry modelData
                 text: modelData.name ?? ""
                 visible: text.length > 0
-                icon.name: modelData?.icon ?? ""
-                // contentItem: RowLayout {
-                contentItem: Label {
-                    verticalAlignment: Text.AlignVCenter
-                    text: item.text
+                icon.source: Quickshell.iconPath(modelData.icon)
+                contentItem: RowLayout {
+                    spacing: item.spacing
+                    Image {
+                        source: item.icon.source
+                        Layout.preferredHeight: item.icon.height
+                        Layout.preferredWidth: item.icon.width
+                        sourceSize.height: item.icon.height
+                        sourceSize.width: item.icon.width
+                        visible: item.icon.source
+                    }
+                    Label {
+                        verticalAlignment: Text.AlignVCenter
+                        text: item.text
+                    }
+                    Spacer {}
                 }
-                // }
-
             }
 
             Binding {
                 target: viewModel
                 property: "searchQuery"
-                value: control.text
+                value: searchField.text
             }
         }
 
@@ -84,6 +165,7 @@ LazyLoader {
             windows: [window, WindowManager.barWindow]
             onActiveChanged: {
                 if (!active) {
+                    // searchField.close();
                     root.active = false;
                 }
             }
